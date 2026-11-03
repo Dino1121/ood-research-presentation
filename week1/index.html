@@ -1,0 +1,1293 @@
+
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WEEK 01 | OOD Detection 연구 탐색 프로젝트</title>
+<style>
+:root {
+  --blue:#2563eb;
+  --ink:#111827;
+  --text:#334155;
+  --muted:#64748b;
+  --line:#e2e8f0;
+  --scale:1;
+}
+* {box-sizing:border-box}
+html,body {
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#fff;
+}
+body {
+  font-family:Pretendard,"Noto Sans KR","Malgun Gothic",Arial,sans-serif;
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+}
+button {font:inherit}
+.screen {
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+.stage {
+  position:relative;
+  flex:0 0 auto;
+  width:1280px;
+  height:720px;
+  transform:scale(var(--scale));
+  transform-origin:center center;
+  background:white;
+}
+.slide {
+  display:none;
+  position:absolute;
+  inset:0;
+  padding:67px 88px 57px;
+  background:#fff;
+  flex-direction:column;
+}
+.slide.active {display:flex}
+.eyebrow {
+  font-size:13px;
+  color:var(--blue);
+  font-weight:800;
+  letter-spacing:1.3px;
+  margin-bottom:15px;
+}
+h1,h2,h3,p,figure {margin:0}
+h2 {
+  font-size:42px;
+  line-height:1.25;
+  letter-spacing:-1.35px;
+  font-weight:800;
+}
+h3 {
+  font-size:29px;
+  letter-spacing:-.8px;
+  line-height:1.3;
+}
+p {line-height:1.55}
+.muted {color:var(--muted)}
+.blue {color:var(--blue)}
+.notes {display:none!important}
+
+/* 01. 표지 */
+.cover {justify-content:center}
+.cover h1 {
+  font-size:77px;
+  line-height:1.08;
+  letter-spacing:-3px;
+}
+.cover .bar {
+  width:56px;
+  height:4px;
+  background:var(--blue);
+  margin:28px 0;
+}
+.cover .sub {
+  margin-top:23px;
+  font-size:24px;
+}
+.cover .name {
+  margin-top:60px;
+  font-size:16px;
+  color:var(--muted);
+}
+.cover .graphic {
+  position:absolute;
+  right:103px;
+  top:156px;
+  width:370px;
+  height:370px;
+  border-radius:50%;
+  background:#f8fbff;
+  border:2px solid #dbeafe;
+}
+.cover .graphic:before {
+  content:"";
+  position:absolute;
+  inset:60px;
+  border:2px dashed #bfdbfe;
+  border-radius:50%;
+}
+.dot {
+  position:absolute;
+  width:18px;
+  height:18px;
+  background:var(--blue);
+  border-radius:50%;
+  box-shadow:0 0 0 8px #eaf2ff;
+}
+.dot.a {left:104px;top:145px}
+.dot.b {left:161px;top:92px}
+.dot.c {left:221px;top:172px}
+.dot.d {left:128px;top:247px}
+.dot.e {left:241px;top:229px}
+.dot.f {
+  left:300px;
+  top:60px;
+  background:#f97316;
+  box-shadow:0 0 0 8px #fff1e7;
+}
+
+/* 02. 목차 */
+.toc {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  column-gap:70px;
+  margin-top:72px;
+}
+.toc .item {
+  min-height:127px;
+  border-bottom:1px solid var(--line);
+  display:grid;
+  grid-template-columns:56px 1fr;
+  align-items:center;
+}
+.toc .no {
+  color:var(--blue);
+  font-weight:800;
+  font-size:16px;
+}
+.toc strong {
+  font-size:25px;
+  letter-spacing:-.6px;
+}
+
+/* 03. 연구 방향 */
+.comparison {
+  display:grid;
+  grid-template-columns:1fr 75px 1fr;
+  gap:24px;
+  align-items:center;
+  margin-top:80px;
+}
+.comparison .side .label {
+  font-size:14px;
+  color:var(--blue);
+  font-weight:800;
+  letter-spacing:.9px;
+}
+.comparison .side h3 {
+  margin-top:22px;
+  font-size:37px;
+}
+.comparison .side small {
+  display:block;
+  margin-top:14px;
+  color:var(--muted);
+  font-size:16px;
+}
+.comparison .rule {
+  height:1px;
+  background:var(--line);
+  margin:28px 0 23px;
+}
+.comparison .side p {
+  font-size:21px;
+  color:var(--text);
+  margin:8px 0;
+}
+.comparison .arrow {
+  text-align:center;
+  color:var(--blue);
+  font-size:38px;
+}
+.bottom {
+  border-top:1px solid var(--line);
+  margin-top:auto;
+  padding-top:19px;
+  text-align:center;
+  font-size:19px;
+  color:var(--text);
+}
+.bottom strong {color:var(--blue)}
+
+/* 04. OOD 개념 */
+.lead {
+  font-size:22px;
+  color:var(--text);
+  margin-top:34px;
+}
+.lead strong {color:var(--blue)}
+.examples {
+  display:grid;
+  grid-template-columns:1fr 54px 1fr 54px 1fr;
+  align-items:start;
+  gap:7px;
+  margin-top:55px;
+}
+.example {
+  border-top:3px solid var(--line);
+  padding-top:22px;
+}
+.example.emph {border-color:var(--blue)}
+.example .label {
+  font-size:14px;
+  font-weight:800;
+  color:var(--blue);
+}
+.example h3 {
+  margin-top:17px;
+  font-size:25px;
+}
+.example p {
+  margin-top:10px;
+  color:var(--muted);
+  font-size:16px;
+}
+.arrow2 {
+  text-align:center;
+  padding-top:48px;
+  font-size:31px;
+  color:var(--blue);
+}
+.definitions {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:38px;
+  margin-top:49px;
+  padding-top:24px;
+  border-top:1px solid var(--line);
+}
+.definitions strong {font-size:20px}
+.definitions p {
+  font-size:17px;
+  color:var(--muted);
+  margin-top:9px;
+}
+
+/* 05. Survey */
+.paper {
+  display:grid;
+  grid-template-columns:440px 1fr;
+  gap:52px;
+  align-items:center;
+  flex:1;
+  margin-top:20px;
+}
+.paper h3 {font-size:31px}
+.paper .eng {
+  font-size:18px;
+  color:var(--muted);
+  margin-top:14px;
+}
+.paper .rule {
+  height:1px;
+  background:var(--line);
+  margin:27px 0 21px;
+}
+.paper .summary {
+  font-size:19px;
+  color:var(--text);
+  line-height:1.8;
+}
+.paper figure img {
+  display:block;
+  width:100%;
+  height:348px;
+  object-fit:contain;
+}
+.paper figcaption {
+  font-size:12px;
+  color:var(--muted);
+  text-align:center;
+  margin-top:10px;
+}
+
+/* 06. 프로젝트 목표 */
+.project-pill {
+  display:inline-block;
+  margin-top:27px;
+  font-size:20px;
+  font-weight:700;
+  color:var(--blue);
+}
+.project-goals {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:36px;
+  margin-top:87px;
+}
+.project-step {
+  border-top:3px solid #cbd5e1;
+  padding-top:23px;
+}
+.project-step:last-child {border-color:var(--blue)}
+.project-step .no {
+  font-size:14px;
+  color:var(--blue);
+  font-weight:800;
+}
+.project-step h3 {
+  margin-top:25px;
+  font-size:31px;
+}
+.project-step p {
+  margin-top:17px;
+  color:var(--muted);
+  font-size:19px;
+}
+
+/* 07. Post-hoc, MSP, Energy */
+.posthoc {
+  font-size:20px;
+  margin-top:30px;
+  padding-left:17px;
+  border-left:4px solid var(--blue);
+  color:var(--text);
+}
+.posthoc strong {color:var(--blue)}
+.methods {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:52px;
+  margin-top:53px;
+}
+.method {
+  border-top:3px solid #cbd5e1;
+  padding-top:22px;
+}
+.method:last-child {border-color:var(--blue)}
+.method .small {
+  color:var(--blue);
+  font-size:13px;
+  font-weight:800;
+}
+.method h3 {
+  font-size:36px;
+  margin-top:15px;
+}
+.method .full {
+  margin-top:7px;
+  color:var(--muted);
+  font-size:16px;
+}
+.method .desc {
+  font-size:18px;
+  color:var(--text);
+  margin-top:22px;
+}
+.formula {
+  display:block;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:24px;
+  margin-top:20px;
+  color:var(--ink);
+  white-space:nowrap;
+}
+.formula sub,.formula sup {font-size:13px}
+.formula-note {
+  font-size:13px;
+  color:var(--muted);
+  margin-top:11px;
+}
+
+/* 08. 선정 이유 */
+.reasons {margin-top:64px}
+.reason {
+  display:grid;
+  grid-template-columns:64px 320px 1fr;
+  align-items:center;
+  min-height:105px;
+  border-top:1px solid var(--line);
+}
+.reason:last-child {border-bottom:1px solid var(--line)}
+.reason .no {
+  font-size:16px;
+  color:var(--blue);
+  font-weight:800;
+}
+.reason strong {font-size:24px}
+.reason p {
+  font-size:18px;
+  color:var(--muted);
+}
+
+/* 09. 다음 주 계획 */
+.next {margin-top:69px}
+.next .reason {min-height:109px}
+.deliverable {
+  margin-top:46px;
+  font-size:20px;
+  color:var(--text);
+}
+.deliverable strong {color:var(--blue)}
+
+/* 10. 마무리 */
+.end {
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+.end h1 {font-size:77px}
+.end p {
+  margin-top:22px;
+  font-size:19px;
+  color:var(--muted);
+}
+.end .name {
+  margin-top:43px;
+  font-size:15px;
+}
+
+/* 슬라이드 조작 UI */
+.back {
+  position:fixed;
+  z-index:30;
+  left:17px;
+  top:15px;
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:8px;
+  padding:8px 12px;
+  font-size:12px;
+  font-weight:650;
+  color:var(--muted);
+  text-decoration:none;
+}
+.controls {
+  position:fixed;
+  z-index:30;
+  bottom:19px;
+  right:20px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#fffffff9;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:9px 11px;
+  box-shadow:0 4px 18px #00000012;
+}
+.controls button {
+  cursor:pointer;
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:7px;
+  min-width:32px;
+  height:32px;
+  color:var(--blue);
+}
+.controls button:disabled {
+  opacity:.3;
+  cursor:default;
+}
+.controls .memo {
+  font-size:12px;
+  padding:0 11px;
+  color:var(--muted);
+  font-weight:700;
+}
+.count {
+  min-width:50px;
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+}
+.progress {
+  position:fixed;
+  z-index:25;
+  bottom:0;
+  left:0;
+  right:0;
+  height:4px;
+}
+.progress>div {
+  height:100%;
+  background:var(--blue);
+  transition:width .18s;
+}
+.speaker {
+  position:fixed;
+  z-index:40;
+  left:50%;
+  bottom:70px;
+  transform:translateX(-50%);
+  width:min(760px,calc(100% - 36px));
+  border-radius:12px;
+  background:#111827f9;
+  color:#fff;
+  padding:22px 25px;
+  box-shadow:0 15px 40px #0003;
+}
+.speaker[hidden] {display:none}
+.speaker strong {font-size:13px}
+.speaker p {
+  font-size:15px;
+  color:#e5e7eb;
+  margin-top:12px;
+  max-height:40vh;
+  overflow:auto;
+  line-height:1.7;
+}
+
+/* 인쇄 */
+@media print {
+  @page {size:1280px 720px;margin:0}
+  html,body {
+    overflow:visible;
+    height:auto;
+  }
+  .screen {
+    position:static;
+    display:block;
+    overflow:visible;
+  }
+  .stage {
+    position:static;
+    transform:none!important;
+    height:auto;
+  }
+  .slide {
+    position:relative;
+    display:flex!important;
+    width:1280px;
+    height:720px;
+    break-after:page;
+  }
+  .back,.controls,.progress,.speaker {
+    display:none!important;
+  }
+}
+</style>
+</head>
+
+<body>
+<a class="back" href="../">← 발표 목록</a>
+
+<div class="screen">
+<main id="stage" class="stage">
+
+<!-- ===================== 01 표지 ===================== -->
+<section class="slide cover active">
+  <div class="eyebrow">
+    AI RESEARCH EXPLORATION · WEEK 01
+  </div>
+
+  <div class="bar"></div>
+
+  <h1>
+    OOD<br>
+    <span class="blue">Detection</span>
+  </h1>
+
+  <p class="sub">
+    연구 탐색 프로젝트 · 첫 구현 계획
+  </p>
+
+  <p class="name">
+    202544030 이현서　·　2026.11.04
+  </p>
+
+  <div class="graphic" aria-hidden="true">
+    <i class="dot a"></i>
+    <i class="dot b"></i>
+    <i class="dot c"></i>
+    <i class="dot d"></i>
+    <i class="dot e"></i>
+    <i class="dot f"></i>
+  </div>
+
+  <aside class="notes">
+    이번 주에는 기존 프로젝트를 마무리한 뒤
+    관심이 생긴 방법론 연구의 방향과,
+    그중 첫 탐색 주제로 OOD Detection을
+    살펴본 이유를 설명하겠습니다.
+
+    이어서 읽기 시작한 Survey 논문을 바탕으로
+    무엇을 구현하고 비교할지 말씀드리겠습니다.
+  </aside>
+</section>
+
+<!-- ===================== 02 목차 ===================== -->
+<section class="slide">
+  <div class="eyebrow">CONTENTS</div>
+  <h2>목차</h2>
+
+  <div class="toc">
+    <div class="item">
+      <span class="no">01</span>
+      <strong>연구 관심사의 변화</strong>
+    </div>
+
+    <div class="item">
+      <span class="no">02</span>
+      <strong>OOD Detection 소개</strong>
+    </div>
+
+    <div class="item">
+      <span class="no">03</span>
+      <strong>Survey와 프로젝트 목표</strong>
+    </div>
+
+    <div class="item">
+      <span class="no">04</span>
+      <strong>첫 구현 방법과 다음주 목표</strong>
+    </div>
+  </div>
+
+  <aside class="notes">
+    기존 프로젝트에서 연구 관심사가 어떻게 달라졌는지,
+    OOD Detection의 개념, 읽기 시작한 Survey와
+    프로젝트 목표, 그리고 첫 구현 방법과
+    다음 주 계획 순으로 발표하겠습니다.
+  </aside>
+</section>
+
+<!-- ===================== 03 연구 방향 ===================== -->
+<section class="slide">
+  <div class="eyebrow">RESEARCH DIRECTION</div>
+
+  <h2>응용 문제 해결에서 방법론 연구로</h2>
+
+  <div class="comparison">
+
+    <div class="side">
+      <div class="label">PREVIOUS PROJECT</div>
+
+      <h3>응용 문제 해결</h3>
+
+      <small>Pediatric Chest X-ray Classification</small>
+
+      <div class="rule"></div>
+
+      <p>모델 학습 · 성능 비교</p>
+      <p>판단 근거 분석</p>
+    </div>
+
+    <div class="arrow">→</div>
+
+    <div class="side">
+      <div class="label">CURRENT INTEREST</div>
+
+      <h3>방법론 연구</h3>
+
+      <small>Robust &amp; Reliable Learning</small>
+
+      <div class="rule"></div>
+
+      <p>일반화 · 신뢰성</p>
+      <p>기존 방법의 한계 · 개선</p>
+    </div>
+  </div>
+
+  <div class="bottom">
+    첫 탐색 주제:
+    <strong>OOD Detection</strong>
+  </div>
+
+  <aside class="notes">
+    이전 폐렴 분류 프로젝트에서는 특정 응용 문제를
+    해결하기 위해 모델을 학습하고 성능과 판단 근거를
+    비교했습니다.
+
+    그런데 프로젝트를 마무리하면서 특정 문제의
+    성능 향상보다는, 모델이 왜 실패하는지,
+    기존 방법론에는 어떤 한계가 있는지를 연구하는 데
+    더 관심이 생겼습니다.
+
+    이와 관련된 여러 주제 중 첫 번째로
+    OOD Detection을 살펴보기로 했습니다.
+  </aside>
+</section>
+
+<!-- ===================== 04 OOD 개념 ===================== -->
+<section class="slide">
+  <div class="eyebrow">BACKGROUND</div>
+
+  <h2>OOD Detection이란?</h2>
+
+
+
+  <div class="examples">
+    <div class="example">
+      <div class="label">TRAINING</div>
+      <h3>고양이 · 강아지</h3>
+      <p>두 클래스만 학습</p>
+    </div>
+
+    <div class="arrow2">→</div>
+
+    <div class="example emph">
+      <div class="label">NEW INPUT</div>
+      <h3>자동차</h3>
+      <p>학습하지 않은 대상</p>
+    </div>
+
+    <div class="arrow2">→</div>
+
+    <div class="example">
+      <div class="label">PREDICTION</div>
+      <h3>고양이? 강아지?</h3>
+      <p>기존 클래스 중 하나를 예측할 수 있음</p>
+    </div>
+  </div>
+
+  <div class="definitions">
+    <div>
+      <strong>ID · In-Distribution</strong>
+      <p>학습 데이터와 같은 분포에서 온 입력</p>
+    </div>
+
+    <div>
+      <strong class="blue">
+        OOD · Out-of-Distribution
+      </strong>
+      <p>학습 데이터 분포에서 벗어난 입력</p>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <strong>OOD Detection</strong> =
+    학습 범위 밖의 입력을 구분하는 문제
+  </div>
+
+  <aside class="notes">
+    분류기는 학습한 클래스 중 하나로
+    입력을 분류하는 모델입니다.
+
+    예를 들어 고양이와 강아지만 학습한 분류기에
+    자동차 이미지를 넣으면, 모델은 고양이나 강아지 중
+    하나로 답할 수 있습니다.
+
+    OOD Detection은 이런 학습 분포 밖의
+    입력을 알아차리는 문제입니다.
+
+    자동차라는 새로운 클래스 이름을 맞히는 것과는
+    다른 문제이고, 이 예시는 이해를 돕기 위한
+    의미적 변화 사례입니다.
+  </aside>
+</section>
+
+<!-- ===================== 05 Survey 소개 ===================== -->
+<section class="slide">
+  <div class="eyebrow">LITERATURE REVIEW</div>
+
+  <h2>이번 주에 읽기 시작한 Survey</h2>
+
+  <div class="paper">
+
+    <div>
+      <h3>
+        Out-of-Distribution Detection
+        in Computer Vision
+      </h3>
+
+      <p class="eng">
+        A Comprehensive Survey and Research Challenges
+      </p>
+
+      <div class="rule"></div>
+
+      <div class="summary">
+        OOD 탐지 방법의 분류<br>
+        기존 접근의 한계와 연구 과제
+      </div>
+    </div>
+
+    <figure>
+      <img
+        src="../assets/survey_taxonomy.png"
+        alt="Survey Figure 1(a) OOD 탐지 방법의 분류"
+      >
+
+      <figcaption>
+        Sayyed et al. (2026), Figure 1(a)
+      </figcaption>
+    </figure>
+  </div>
+
+  <aside class="notes">
+    이번 주에는 OOD Detection 분야를
+    폭넓게 정리한 Survey를 읽기 시작했습니다.
+
+    이 논문은 분류부터 객체 탐지, 세그멘테이션까지
+    여러 OOD 탐지 방법을 체계적으로 정리하고,
+    기존 접근의 한계도 다룹니다.
+
+    아직 논문을 전부 분석한 상태는 아니며,
+    이 논문을 분야의 지도처럼 활용하려고 합니다.
+  </aside>
+</section>
+
+<!-- ===================== 06 프로젝트 목표 ===================== -->
+<section class="slide">
+  <div class="eyebrow">PROJECT GOAL</div>
+
+  <h2>Survey를 바탕으로 진행할 프로젝트</h2>
+
+  <p class="project-pill">
+    대표적인 OOD 탐지 방법을 직접 구현하고 비교
+  </p>
+
+  <div class="project-goals">
+
+    <div class="project-step">
+      <div class="no">01 · SELECT</div>
+      <h3>방법 선정</h3>
+      <p>Survey · 선행연구</p>
+    </div>
+
+    <div class="project-step">
+      <div class="no">02 · REPRODUCE</div>
+      <h3>구현 · 비교</h3>
+      <p>동일 조건 · 탐지 성능</p>
+    </div>
+
+    <div class="project-step">
+      <div class="no">03 · ANALYZE</div>
+      <h3>한계 분석</h3>
+      <p>실패 사례 · 발생 조건</p>
+    </div>
+  </div>
+
+  <div class="bottom">
+    목표:
+    <strong>
+      어떤 조건에서 탐지 방법이 실패하는지 파악
+    </strong>
+  </div>
+
+  <aside class="notes">
+    이 Survey에 소개된 모든 방법을 한 번에
+    구현하는 것은 아닙니다.
+
+    재현 가능한 대표 방법부터 하나씩 골라서
+    직접 구현하고 동일한 조건에서 비교할 계획입니다.
+
+    단순히 어느 방법이 점수가 높은지를 보는 데서
+    끝내지 않고, 어떤 데이터나 조건에서
+    실패하는지를 살펴보려 합니다.
+
+    이 과정을 통해 제가 더 연구하고 싶은 구체적인
+    문제를 찾는 것이 이번 연구 탐색 프로젝트의 목적입니다.
+  </aside>
+</section>
+
+<!-- ===================== 07 MSP와 Energy ===================== -->
+<section class="slide">
+  <div class="eyebrow">FIRST BASELINES</div>
+
+  <h2>먼저 구현할 방법: MSP와 Energy</h2>
+
+  <p class="posthoc">
+    <strong>Post-hoc</strong> ·
+    학습된 분류기의 출력으로 OOD 점수를 계산하는 접근
+  </p>
+
+  <div class="methods">
+
+    <div class="method">
+      <div class="small">01 · SOFTMAX-BASED</div>
+
+      <h3>MSP</h3>
+
+      <p class="full">
+        Maximum Softmax Probability
+      </p>
+
+      <p class="desc">
+        가장 높은 예측 확률을 점수로 사용
+      </p>
+
+      <span class="formula">
+        MSP(x) = max<sub>k</sub> p(k | x)
+      </span>
+
+      <p class="formula-note">
+        낮은 MSP → OOD 가능성
+      </p>
+    </div>
+
+    <div class="method">
+      <div class="small">02 · LOGIT-BASED</div>
+
+      <h3>Energy</h3>
+
+      <p class="full">
+        Energy-Based Score
+      </p>
+
+      <p class="desc">
+        Softmax 이전 logit들의 크기를 반영
+      </p>
+
+      <span class="formula">
+        E(x) = −T log Σ<sub>k</sub> exp(f<sub>k</sub>(x)/T)
+      </span>
+
+      <p class="formula-note">
+        높은 Energy → OOD 가능성 (일반적인 설정)
+      </p>
+    </div>
+  </div>
+
+  <aside class="notes">
+    우선 MSP와 Energy 두 가지를 구현할 계획입니다.
+
+    두 방법 모두 이미 학습된 분류기를
+    재학습하지 않고 그 출력에서 점수를 구하는
+    Post-hoc 접근입니다.
+
+    MSP는 클래스별 Softmax 확률 중 최댓값을 사용합니다.
+    모델이 어떤 클래스도 높게 확신하지 않으면
+    OOD일 가능성이 높다고 보는 방식입니다.
+
+    Energy는 Softmax 확률로 변환하기 전
+    logit 값들을 로그합지수 형태로 결합한 점수입니다.
+
+    T는 온도 매개변수이고 기본 비교에서는
+    T를 1로 둘 수 있습니다.
+
+    두 점수는 정의와 방향이 다르므로 실제 평가에서는
+    ID/OOD 판단 방향을 통일할 예정입니다.
+  </aside>
+</section>
+
+<!-- ===================== 08 선정 이유 ===================== -->
+<section class="slide">
+  <div class="eyebrow">METHOD SELECTION</div>
+
+  <h2>왜 이 두 방법부터 시작할까?</h2>
+
+  <div class="reasons">
+
+    <div class="reason">
+      <span class="no">01</span>
+      <strong>대표적인 기준선</strong>
+      <p>후속 방법과 비교할 출발점</p>
+    </div>
+
+    <div class="reason">
+      <span class="no">02</span>
+      <strong>추가 학습 불필요</strong>
+      <p>기존 분류기에 바로 적용 가능</p>
+    </div>
+
+    <div class="reason">
+      <span class="no">03</span>
+      <strong>점수 계산의 차이</strong>
+      <p>최대 Softmax 확률 vs logit 기반 Energy</p>
+    </div>
+  </div>
+
+  <div class="bottom">
+    같은 분류기를 사용해
+    <strong>점수 계산 방식에 따른 차이</strong>부터 확인
+  </div>
+
+  <aside class="notes">
+    이 두 방법을 먼저 선택한 이유는 세 가지입니다.
+
+    첫째, OOD Detection 분야에서 기본적인
+    비교 기준으로 사용되는 방법입니다.
+
+    둘째, 이미 학습된 분류기를 그대로 이용하기 때문에
+    구현 부담이 상대적으로 작습니다.
+
+    셋째, MSP는 가장 큰 확률만 보는 반면
+    Energy는 전체 logit을 반영합니다.
+
+    따라서 동일한 분류기로 두 점수를 계산해 보면
+    점수 설계에 따라 OOD를 구분하는 능력이
+    어떻게 달라지는지 살펴볼 수 있습니다.
+
+    이 비교가 이후 더 복잡한 방법을 이해하기 위한
+    출발점이 될 것입니다.
+  </aside>
+</section>
+
+<!-- ===================== 09 다음주 목표 ===================== -->
+<section class="slide">
+  <div class="eyebrow">NEXT WEEK</div>
+
+  <h2>다음주 목표</h2>
+
+  <div class="next">
+
+    <div class="reason">
+      <span class="no">01</span>
+      <strong>분류기 · 데이터 준비</strong>
+      <p>CIFAR-10 · OOD 평가 데이터</p>
+    </div>
+
+    <div class="reason">
+      <span class="no">02</span>
+      <strong>MSP · Energy 구현</strong>
+      <p>동일 분류기에서 점수 계산</p>
+    </div>
+
+    <div class="reason">
+      <span class="no">03</span>
+      <strong>기초 비교 결과 정리</strong>
+      <p>AUROC · 점수 분포 · 실패 사례</p>
+    </div>
+  </div>
+
+  <div class="deliverable">
+    다음 발표:
+    <strong>구현 코드와 첫 비교 결과</strong>
+  </div>
+
+  <aside class="notes">
+    다음 주에는 먼저 CIFAR-10으로 학습된 분류기를
+    준비하고 OOD 평가 데이터를 정하겠습니다.
+
+    이어서 MSP와 Energy Score를 직접 구현하고,
+    같은 모델과 같은 데이터에서 두 방법을 비교하겠습니다.
+
+    AUROC 같은 성능 지표와 점수 분포를 살펴보고,
+    어떤 입력을 잘 구분하지 못하는지도 확인하겠습니다.
+
+    아직 실험은 시작하지 않았고
+    다음 발표에는 구현 코드와 첫 결과를
+    가져오는 것이 목표입니다.
+  </aside>
+</section>
+
+<!-- ===================== 10 마무리 ===================== -->
+<section class="slide end">
+  <div class="eyebrow">
+    AI RESEARCH EXPLORATION · WEEK 01
+  </div>
+
+  <h1>감사합니다</h1>
+
+  <p>
+    OOD Detection · Survey Reading · Baseline Reproduction
+  </p>
+
+  <p class="name">
+    202544030 이현서
+  </p>
+
+  <aside class="notes">
+    감사합니다.
+  </aside>
+</section>
+
+</main>
+</div>
+
+<!-- 슬라이드 조작 -->
+<div class="controls">
+  <button
+    id="memoButton"
+    class="memo"
+    type="button"
+    title="N: 발표 메모"
+  >메모</button>
+
+  <span class="count">
+    <span id="current">1</span> /
+    <span id="total">10</span>
+  </span>
+
+  <button
+    id="prev"
+    type="button"
+    aria-label="이전 슬라이드"
+  >←</button>
+
+  <button
+    id="next"
+    type="button"
+    aria-label="다음 슬라이드"
+  >→</button>
+</div>
+
+<div class="progress">
+  <div id="bar"></div>
+</div>
+
+<aside id="speaker" class="speaker" hidden>
+  <strong>발표 메모</strong>
+  <p id="notesText"></p>
+</aside>
+
+<script>
+(() => {
+  const stage = document.getElementById('stage');
+  const slides = [...stage.querySelectorAll('.slide')];
+
+  const prev = document.getElementById('prev');
+  const next = document.getElementById('next');
+  const counter = document.getElementById('current');
+  const bar = document.getElementById('bar');
+
+  const speaker = document.getElementById('speaker');
+  const memoButton = document.getElementById('memoButton');
+  const notesText = document.getElementById('notesText');
+
+  let current = 0;
+
+  document.getElementById('total').textContent =
+    String(slides.length);
+
+  // 화면 크기에 맞춰 중앙 정렬
+  function fit() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+
+    const scale = Math.min(
+      w / 1280,
+      h / 720
+    );
+
+    stage.style.setProperty(
+      '--scale',
+      String(scale)
+    );
+  }
+
+  function show(i, hash = true) {
+    current = Math.max(
+      0,
+      Math.min(slides.length - 1, i)
+    );
+
+    slides.forEach((slide, index) => {
+      const active = index === current;
+
+      slide.classList.toggle('active', active);
+      slide.setAttribute(
+        'aria-hidden',
+        String(!active)
+      );
+    });
+
+    counter.textContent = String(current + 1);
+    prev.disabled = current === 0;
+    next.disabled = current === slides.length - 1;
+
+    bar.style.width =
+      ((current + 1) / slides.length * 100) + '%';
+
+    const note = slides[current].querySelector('.notes');
+
+    notesText.textContent =
+      note?.textContent.trim().replace(/\s+/g, ' ') || '';
+
+    if (hash) {
+      history.replaceState(null, '', '#/' + current);
+    }
+  }
+
+  prev.addEventListener('click', () => {
+    show(current - 1);
+  });
+
+  next.addEventListener('click', () => {
+    show(current + 1);
+  });
+
+  memoButton.addEventListener('click', () => {
+    speaker.hidden = !speaker.hidden;
+  });
+
+  window.addEventListener('resize', fit);
+
+  window.addEventListener('hashchange', () => {
+    const match = location.hash.match(/^#\/(\d+)$/);
+
+    show(
+      match ? Number(match[1]) : 0,
+      false
+    );
+  });
+
+  window.addEventListener('keydown', e => {
+    const activeTag = document.activeElement?.tagName;
+
+    if (['INPUT', 'TEXTAREA', 'SELECT'].includes(activeTag)) {
+      return;
+    }
+
+    if ([
+      'ArrowRight',
+      'ArrowDown',
+      'PageDown',
+      ' '
+    ].includes(e.key)) {
+      e.preventDefault();
+      show(current + 1);
+    }
+
+    if ([
+      'ArrowLeft',
+      'ArrowUp',
+      'PageUp',
+      'Backspace'
+    ].includes(e.key)) {
+      e.preventDefault();
+      show(current - 1);
+    }
+
+    if (e.key.toLowerCase() === 'n') {
+      speaker.hidden = !speaker.hidden;
+    }
+
+    if (e.key.toLowerCase() === 'f') {
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.();
+      } else {
+        document.documentElement.requestFullscreen?.();
+      }
+    }
+
+    if (e.key === 'Escape') {
+      speaker.hidden = true;
+    }
+
+    if (e.key === 'Home') {
+      show(0);
+    }
+
+    if (e.key === 'End') {
+      show(slides.length - 1);
+    }
+  });
+
+  // 모바일 스와이프
+  let startX = null;
+
+  stage.addEventListener('touchstart', e => {
+    if (e.touches.length === 1) {
+      startX = e.touches[0].clientX;
+    }
+  }, { passive:true });
+
+  stage.addEventListener('touchend', e => {
+    if (startX === null) return;
+
+    const dx =
+      e.changedTouches[0].clientX - startX;
+
+    if (Math.abs(dx) > 55) {
+      show(current + (dx < 0 ? 1 : -1));
+    }
+
+    startX = null;
+  }, { passive:true });
+
+  fit();
+
+  const match = location.hash.match(/^#\/(\d+)$/);
+
+  show(
+    match ? Number(match[1]) : 0,
+    false
+  );
+})();
+</script>
+
+</body>
+</html>
