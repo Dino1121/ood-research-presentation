@@ -1,6 +1,6 @@
 # Research Exploration — OOD Detection
 
-기존 `pneumonia-presentation`의 **주차별 발표자료 홈페이지 + 웹 슬라이드** 구조를 참고한 별도 정적 웹사이트입니다.
+**주차별 발표자료 홈페이지 + 웹 슬라이드** 구조의 별도 정적 웹사이트입니다.
 
 - **홈페이지:** `index.html`
 - **WEEK 01 발표:** `week1/index.html` — OOD Detection Survey 학습 및 향후 구현 계획 (12장)
