@@ -34,10 +34,4 @@ python -m http.server 8000
 3. 저장소 **Settings → Pages → Build and deployment → Deploy from a branch**에서 `main` / `/(root)`를 선택합니다.
 4. 배포 후 URL은 `https://Dino1121.github.io/<repository-name>/` 형식입니다.
 
-**주의:** 배포는 별도로 해야 하며, 이 파일을 만들었다고 GitHub Pages 사이트가 자동으로 생성되지는 않습니다.
 
-## 내용 범위
-
-이 페이지는 Survey를 읽기 시작한 시점의 문헌 탐색과 계획을 담습니다. 구현과 성능 실험은 아직 진행하지 않았습니다. 계획상 첫 Baseline은 MSP와 Energy Score이고, 초기 실험은 CIFAR-10 ID / SVHN OOD 등으로 구상했습니다. 추후 실험 데이터와 분석으로 발표를 확장할 수 있습니다.
-
-**참고 논문:** A Q M Sazzad Sayyed et al., *Out-of-Distribution Detection in Computer Vision: A Comprehensive Survey and Research Challenges* (2026).
