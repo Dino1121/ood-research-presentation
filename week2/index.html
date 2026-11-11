@@ -1,0 +1,1250 @@
+
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>WEEK 02 | OOD Detection 비교 실험</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="slides.js"></script>
+</head>
+<body>
+
+<a href="../" class="back-to-home">
+  ← 발표 목록
+</a>
+
+<main id="deck" class="deck">
+
+  <!-- 01 표지 -->
+  <section class="slide active">
+    <div class="shell cover-grid">
+      <div>
+        <p class="kicker">AI RESEARCH EXPLORATION · WEEK 02</p>
+        <span class="accent-rule"></span>
+        <h1>
+          OOD Detection
+          <em>MSP · Energy 비교 실험</em>
+        </h1>
+        <p class="subtitle">
+          기존 OOD 탐지 방법의 구현, 성능 비교와 Logit 분석
+        </p>
+        <p class="byline">202544030 이현서 <span>·</span> 2026.11.11</p>
+      </div>
+      <div class="cover-art" aria-hidden="true">
+        <span class="ring ring-one"></span>
+        <span class="ring ring-two"></span>
+        <span class="spot spot-a"></span>
+        <span class="spot spot-b"></span>
+        <span class="spot spot-c"></span>
+        <span class="spot spot-d"></span>
+        <b>ID <small>/</small> OOD</b>
+      </div>
+    </div>
+    <aside class="notes">
+      지난주에는 OOD Detection 관련 Survey를 공부했고,
+      첫 비교 대상으로 MSP와 Energy를 정했습니다.
+      이번 주에는 두 방법을 직접 구현해 성능과 실패 사례를 비교했습니다.
+    </aside>
+  </section>
+
+  <!-- 02 목차 -->
+  <section class="slide">
+    <div class="shell">
+      <header class="heading">
+        <p class="kicker">CONTENTS</p>
+        <h2>목차</h2>
+        <p>이번 주에 진행한 내용을 네 부분으로 정리했습니다.</p>
+      </header>
+      <div class="toc">
+        <article>
+          <b>01</b>
+          <div>
+            <h3>프로젝트 개요</h3>
+            <p>지난주 진행사항 · OOD Detection</p>
+          </div>
+        </article>
+        <article>
+          <b>02</b>
+          <div>
+            <h3>점수 계산 방법</h3>
+            <p>Logit · Softmax · MSP · Energy</p>
+          </div>
+        </article>
+        <article>
+          <b>03</b>
+          <div>
+            <h3>실험 및 결과</h3>
+            <p>실험 환경 · 평가 지표 · 분석</p>
+          </div>
+        </article>
+        <article>
+          <b>04</b>
+          <div>
+            <h3>정리와 다음 단계</h3>
+            <p>확인한 내용 · 추가 실험 · 연구 방향</p>
+          </div>
+        </article>
+      </div>
+    </div>
+    <aside class="notes">
+      먼저 지난주에 어떤 내용을 공부했는지와
+      OOD Detection의 개념을 짚겠습니다.
+      이후 Logit과 Softmax를 통해 두 탐지 점수를 이해하고,
+      실제 실험 결과와 다음 주 계획을 설명하겠습니다.
+    </aside>
+  </section>
+
+  <!-- 03 지난주와 이번 주 -->
+  <section class="slide">
+    <div class="shell compact-shell">
+      <header class="heading">
+        <p class="kicker">RESEARCH OVERVIEW</p>
+        <h2>지난주와 이번 주</h2>
+        <p>
+          서베이 논문에서 탐지 방법을 살펴본 뒤
+          첫 비교 실험을 진행했습니다.
+        </p>
+      </header>
+
+      <div class="recap-pair">
+        <article>
+          <span>WEEK 01</span>
+          <h3>Survey 학습</h3>
+          <p>
+            OOD 탐지 문제와 기존 방법들을 조사하고,
+            <strong>MSP와 Energy</strong>를 첫 비교 대상으로
+            선정했습니다.
+          </p>
+        </article>
+
+        <div class="connect-arrow">→</div>
+
+        <article class="accent-top">
+          <span>WEEK 02</span>
+          <h3>구현 및 비교</h3>
+          <p>
+            같은 분류기에 두 방법을 적용해
+            <strong>탐지 성능과 판정 차이</strong>를 분석했습니다.
+          </p>
+        </article>
+      </div>
+
+      <p class="callout">
+        <b>장기 목표</b>
+        여러 OOD 탐지 방법이 어떤 조건에서 실패하는지
+        확인하고, 개선 가능한 문제를 찾는 것입니다.
+      </p>
+    </div>
+    <aside class="notes">
+      지난주에는 2026년 OOD Detection Survey를 바탕으로
+      방법들을 조사했습니다.
+
+      이번 주에 바로 새로운 방법을 제안하려는 것이 아니라,
+      먼저 MSP와 Energy를 같은 분류기에 적용하고 비교해보았습니다.
+
+      최종 관심은 성능 순위보다는 방법의 실패 조건과 한계입니다.
+    </aside>
+  </section>
+
+  <!-- 04 OOD Detection -->
+  <section class="slide">
+    <div class="shell">
+      <header class="heading">
+        <p class="kicker">BACKGROUND</p>
+        <h2>OOD Detection</h2>
+        <p>모델이 학습한 데이터 분포와 다른 입력을 감지하는 문제입니다.</p>
+      </header>
+
+      <div class="ood-pair">
+        <article class="compact-panel">
+          <div class="panel-label">ID · CIFAR-10</div>
+          <h3>학습한 10개 클래스</h3>
+
+          <div class="classes">
+            <span>비행기</span>
+            <span>자동차</span>
+            <span>새</span>
+            <span>고양이</span>
+            <span>사슴</span>
+            <span>개</span>
+            <span>개구리</span>
+            <span>말</span>
+            <span>배</span>
+            <span>트럭</span>
+          </div>
+
+          <p class="panel-explain">
+            CIFAR-10 분포에서 온 이미지를
+            <strong>ID(In-Distribution)</strong>로 사용합니다.
+          </p>
+        </article>
+
+        <article class="compact-panel orange-panel">
+          <div class="panel-label">OOD · CIFAR-100</div>
+          <h3>학습 분포 밖의 입력</h3>
+
+          <div class="tank-row">
+            <img
+              src="assets/ood_airplane_tank.jpg"
+              alt="CIFAR-100 탱크"
+            >
+            <div>
+              <b>실제: 탱크</b>
+              <small>CIFAR-10에 없는 클래스</small>
+              <strong>분류기 예측: 비행기</strong>
+            </div>
+          </div>
+
+          <p class="panel-explain">
+            모델은 학습한 10개 클래스 중 하나를 예측합니다.
+            <strong>
+              OOD 탐지는 그 입력을 ID로 받아들일지 별도로 판단
+            </strong>합니다.
+          </p>
+        </article>
+      </div>
+
+      <p class="inline-summary">
+        이번 실험에서는 CIFAR-10을 ID,
+        CIFAR-100과 SVHN을 OOD 평가 데이터로 사용했습니다.
+      </p>
+    </div>
+    <aside class="notes">
+      CIFAR-10에는 비행기, 자동차, 새, 고양이, 사슴,
+      개, 개구리, 말, 배, 트럭이 있습니다.
+
+      따라서 분류기는 탱크가 들어와도 배운 클래스 중
+      하나로 예측합니다. 실제 이 탱크는 비행기로 예측됐습니다.
+
+      OOD Detection은 새 클래스 이름을 맞히는 것과는 다르며,
+      학습 분포 밖에서 온 입력인지를 탐지하는 문제입니다.
+
+      정확히 말하면 OOD는 단순히 클래스 이름이 다른 것보다
+      넓은 개념입니다.
+    </aside>
+  </section>
+
+  <!-- 05 장 구분 -->
+  <section class="slide section-break">
+    <div class="shell">
+      <span class="chapter-number">01 / 03</span>
+      <span class="accent-rule"></span>
+      <h2>점수 계산 방법</h2>
+      <p>Logit → Softmax → MSP · Energy</p>
+    </div>
+    <aside class="notes">
+      두 방법을 비교하기 전에 모델의 출력인 Logit과,
+      이를 변환하는 Softmax를 설명하겠습니다.
+    </aside>
+  </section>
+
+  <!-- 06 Logit -->
+  <section class="slide">
+    <div class="shell">
+      <header class="heading">
+        <p class="kicker">BASIC CONCEPT</p>
+        <h2>Logit</h2>
+        <p>
+          분류 모델이 각 클래스에 대해 출력하는
+          <strong>Softmax 적용 전의 실수 점수</strong>입니다.
+        </p>
+      </header>
+
+      <div class="logit-demo">
+        <div class="image-tile">
+          <img src="assets/ood_airplane_tank.jpg" alt="탱크 이미지">
+          <strong>CIFAR-100 · 탱크</strong>
+          <span>ResNet-18의 실제 입력</span>
+        </div>
+
+        <div class="logit-list">
+          <div class="logit-row">
+            <span>비행기</span>
+            <div class="meter"><i style="width:100%"></i></div>
+            <b>5.899</b>
+          </div>
+          <div class="logit-row">
+            <span>배</span>
+            <div class="meter"><i style="width:15.4%"></i></div>
+            <b>0.910</b>
+          </div>
+          <div class="logit-row">
+            <span>자동차</span>
+            <div class="meter"><i style="width:4%"></i></div>
+            <b>0.233</b>
+          </div>
+          <div class="logit-row light-row">
+            <span>나머지 7개</span>
+            <div class="meter muted-meter">각각 다른 실수</div>
+            <b>…</b>
+          </div>
+
+          <p class="diagram-caption">
+            10개 Logit 중
+            <strong>가장 큰 값인 ‘비행기’</strong>가
+            최종 예측 클래스입니다.
+            5.899는 확률이 아닙니다.
+          </p>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">
+      ResNet-18은 CIFAR-10의 10개 클래스에 대응하는
+      Logit 10개를 출력합니다.
+
+      이 사례에서 비행기 Logit이 5.899로 가장 높아
+      비행기로 예측합니다.
+
+      Logit은 정규화 전의 점수이므로 0에서 1 사이일
+      필요가 없고 음수도 가능합니다.
+
+      여기서는 가독성을 위해 가장 큰 세 값만 그렸습니다.
+    </aside>
+  </section>
+
+  <!-- 07 Softmax -->
+  <section class="slide">
+    <div class="shell">
+      <header class="heading">
+        <p class="kicker">BASIC CONCEPT</p>
+        <h2>Softmax</h2>
+        <p>
+          Logit을 <strong>0~1 사이 값으로 변환</strong>해
+          합이 1이 되도록 만드는 함수입니다.
+        </p>
+      </header>
+
+      <div class="formula-inline">
+        <div class="display-math">
+          <math display="block">
+            <msub><mi>p</mi><mi>k</mi></msub>
+            <mo>=</mo>
+            <mfrac>
+              <msup>
+                <mi>e</mi>
+                <msub><mi>z</mi><mi>k</mi></msub>
+              </msup>
+              <mrow>
+                <munderover>
+                  <mo>∑</mo>
+                  <mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow>
+                  <mi>K</mi>
+                </munderover>
+                <msup>
+                  <mi>e</mi>
+                  <msub><mi>z</mi><mi>j</mi></msub>
+                </msup>
+              </mrow>
+            </mfrac>
+          </math>
+        </div>
+        <span>클래스별 Logit의 상대적인 차이를 확률 형태로 표현</span>
+      </div>
+
+      <div class="softmax-demo">
+        <article>
+          <span>LOGIT A</span>
+          <h3>[4, 2]</h3>
+          <div class="probbar">
+            <b>88.1%</b><em>11.9%</em>
+          </div>
+          <p>Softmax → [0.881, 0.119]</p>
+        </article>
+
+        <div class="equals">=</div>
+
+        <article>
+          <span>LOGIT B</span>
+          <h3>[14, 12]</h3>
+          <div class="probbar">
+            <b>88.1%</b><em>11.9%</em>
+          </div>
+          <p>Softmax → [0.881, 0.119]</p>
+        </article>
+      </div>
+
+      <p class="inline-summary">
+        모든 Logit에 같은 값을 더하면 Softmax 결과는 같습니다.
+        <strong>공통적인 크기 변화는 구분하지 못합니다.</strong>
+      </p>
+    </div>
+    <aside class="notes">
+      Softmax는 각 Logit에 지수함수를 적용한 뒤
+      전체 지수값의 합으로 나눕니다.
+
+      따라서 합은 1이 되고, 큰 Logit은 큰 값으로 변환됩니다.
+
+      [4,2]와 [14,12]는 값 자체는 다르지만
+      두 클래스 간 차이가 모두 2입니다.
+
+      Softmax 결과는 동일하게 약 88.1%와 11.9%입니다.
+      다만 이 출력이 항상 실제 정답 확률로 잘 보정돼
+      있는 것은 아닙니다.
+    </aside>
+  </section>
+
+  <!-- 08 MSP와 Energy -->
+  <section class="slide">
+    <div class="shell">
+      <header class="heading">
+        <p class="kicker">POST-HOC OOD DETECTION</p>
+        <h2>MSP와 Energy</h2>
+        <p>
+          둘 다 <strong>이미 학습된 분류기의 Logit</strong>으로
+          OOD 점수를 계산합니다.
+        </p>
+      </header>
+
+      <div class="methods">
+        <article class="compact-panel">
+          <div class="panel-label">
+            MSP · MAXIMUM SOFTMAX PROBABILITY
+          </div>
+          <h3>최대 Softmax 값</h3>
+
+          <div class="display-math">
+            <math display="block">
+              <msub><mi>S</mi><mtext>MSP</mtext></msub>
+              <mo>(</mo><mi>x</mi><mo>)</mo>
+              <mo>=</mo>
+              <munder><mo>max</mo><mi>k</mi></munder>
+              <mfrac>
+                <msup>
+                  <mi>e</mi>
+                  <msub><mi>z</mi><mi>k</mi></msub>
+                </msup>
+                <mrow>
+                  <munder><mo>∑</mo><mi>j</mi></munder>
+                  <msup>
+                    <mi>e</mi>
+                    <msub><mi>z</mi><mi>j</mi></msub>
+                  </msup>
+                </mrow>
+              </mfrac>
+            </math>
+          </div>
+
+          <p>
+            각 클래스의 Softmax를 계산한 뒤
+            <strong>가장 큰 값 하나</strong>를 사용합니다.
+          </p>
+        </article>
+
+        <article class="compact-panel green-panel">
+          <div class="panel-label">ENERGY-BASED SCORE</div>
+          <h3>LogSumExp</h3>
+
+          <div class="display-math">
+            <math display="block">
+              <msub><mi>S</mi><mtext>Energy</mtext></msub>
+              <mo>(</mo><mi>x</mi><mo>)</mo>
+              <mo>=</mo>
+              <mi>log</mi>
+              <mrow>
+                <munder><mo>∑</mo><mi>k</mi></munder>
+                <msup>
+                  <mi>e</mi>
+                  <msub><mi>z</mi><mi>k</mi></msub>
+                </msup>
+              </mrow>
+            </math>
+          </div>
+
+          <p>
+            확률로 정규화하지 않고
+            <strong>Logit 값의 크기</strong>도 반영합니다.
+          </p>
+        </article>
+      </div>
+
+      <p class="inline-summary">
+        이번 구현에서는 두 점수 모두
+        <strong>값이 높을수록 ID에 가깝다</strong>는 방향으로
+        통일했습니다.
+        Energy는 원 논문 Energy의 부호를 뒤집은 점수(T=1)입니다.
+      </p>
+    </div>
+    <aside class="notes">
+      MSP는 Maximum Softmax Probability입니다.
+      Softmax의 최대 확률을 점수로 사용합니다.
+
+      Energy는 LogSumExp를 사용하며,
+      Logit의 전체 크기가 변하면 점수도 변할 수 있습니다.
+
+      이번 실험에서 사용한 Energy 점수는
+      논문의 원래 Energy 정의에 마이너스를 붙인 값입니다.
+
+      즉 클수록 ID라는 점에서 MSP와 방향을 통일했습니다.
+      추가 학습이 없는 Post-hoc 방식입니다.
+    </aside>
+  </section>
+
+  <!-- 09 점수 계산 예시 -->
+  <section class="slide">
+    <div class="shell compact-shell">
+      <header class="heading">
+        <p class="kicker">SCORE EXAMPLE</p>
+        <h2>점수 계산 예시</h2>
+        <p>
+          MSP는 같은 값을 출력하더라도
+          Energy는 달라질 수 있습니다.
+        </p>
+      </header>
+
+      <div class="example-compare">
+        <article>
+          <span>LOGIT A</span>
+          <h3>[4, 2]</h3>
+          <div class="value-line">
+            <small>MSP</small><strong>0.8808</strong>
+          </div>
+          <div class="value-line">
+            <small>Energy</small><strong>4.1269</strong>
+          </div>
+        </article>
+
+        <div class="versus">VS</div>
+
+        <article>
+          <span>LOGIT B</span>
+          <h3>[14, 12]</h3>
+          <div class="value-line">
+            <small>MSP</small><strong>0.8808</strong>
+          </div>
+          <div class="value-line emphasis">
+            <small>Energy</small><strong>14.1269</strong>
+          </div>
+        </article>
+      </div>
+
+      <div class="explain-lines">
+        <p>
+          <b>MSP</b>
+          상대적인 Logit 차이가 같으므로 점수도 같습니다.
+        </p>
+        <p>
+          <b>Energy</b>
+          Logit에 10을 더하면 점수도 정확히 10 증가합니다.
+        </p>
+      </div>
+
+      <p class="inline-summary">
+        이 차이가 OOD 탐지에 실제로 도움이 되는지는
+        <strong>데이터를 통해 평가</strong>해야 합니다.
+      </p>
+    </div>
+    <aside class="notes">
+      이것은 설명용 가상 Logit입니다.
+      두 벡터의 Softmax가 같기 때문에 MSP는 모두 0.8808입니다.
+
+      하지만 Logit 전체에 같은 값 10을 더한 B의 Energy는
+      A보다 10 큽니다.
+
+      Energy가 항상 더 좋은 방법이라는 뜻은 아니고,
+      MSP와 다른 정보를 반영해 서로 다른 점수를 줄 수
+      있다는 뜻입니다.
+    </aside>
+  </section>
+
+<!-- 10. 임계값으로 ID/OOD 판정 -->
+<section class="slide">
+  <div class="shell">
+
+    <header class="heading">
+      <p class="kicker">OOD DECISION RULE</p>
+      <h2>임계값으로 ID/OOD 판정</h2>
+      <p>
+        MSP와 Energy는 각각 탐지 점수를 계산하고,
+        <strong>점수가 임계값보다 낮으면 OOD로 판단</strong>합니다.
+      </p>
+    </header>
+
+    <div class="threshold-flow">
+
+      <article class="threshold-step">
+        <span>STEP 01 · 임계값 설정</span>
+        <h3>ID 검증 데이터 1,000장</h3>
+        <p>
+          각 방법으로 검증 이미지의 점수를 계산하고,
+          <strong>점수 하위 5% 지점</strong>을
+          임계값으로 설정합니다.
+        </p>
+        <small>MSP와 Energy의 임계값은 별도로 설정</small>
+      </article>
+
+      <div class="threshold-flow-arrow">→</div>
+
+      <article class="threshold-step">
+        <span>STEP 02 · 새로운 이미지 판정</span>
+        <h3>점수와 임계값 비교</h3>
+
+        <div class="threshold-rules">
+          <div class="rule-id">
+            <b>점수 ≥ 임계값</b>
+            <strong>ID 수용</strong>
+          </div>
+          <div class="rule-ood">
+            <b>점수 &lt; 임계값</b>
+            <strong>OOD 거부</strong>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <div class="threshold-case-panel">
+      <div class="threshold-case-heading">
+        <span>실제 탱크 이미지 · SEED 43</span>
+        <h3>같은 이미지에 서로 다른 판정</h3>
+      </div>
+
+      <div class="threshold-example-grid">
+        <article>
+          <span>MSP</span>
+          <p>
+            점수 <b>0.980775</b>
+            <small>≥</small>
+            임계값 <b>0.837584</b>
+          </p>
+          <strong class="result-wrong">
+            ID로 오수용
+          </strong>
+        </article>
+
+        <article>
+          <span>ENERGY</span>
+          <p>
+            점수 <b>5.918490</b>
+            <small>&lt;</small>
+            임계값 <b>5.956187</b>
+          </p>
+          <strong class="result-correct">
+            OOD로 거부
+          </strong>
+        </article>
+      </div>
+    </div>
+
+    <p class="inline-summary">
+      핵심은 <strong>점수 자체가 ID/OOD 판정은 아니라는 것</strong>입니다.
+      점수를 각 방법의 임계값과 비교해야 최종 판정이 내려집니다.
+    </p>
+
+  </div>
+
+  <aside class="notes">
+    앞에서 MSP와 Energy가 어떻게 점수를 계산하는지
+    살펴봤습니다.
+
+    그런데 이 점수만으로는 ID인지 OOD인지
+    결정할 수 없습니다.
+
+    기준점인 임계값이 필요합니다.
+
+    이번 실험에서는 ID 검증 이미지 1,000장의
+    점수를 계산하고, 하위 5% 지점을
+    각 방법의 임계값으로 사용했습니다.
+
+    새로운 이미지의 점수가 임계값 이상이면 ID,
+    낮으면 OOD로 판단합니다.
+
+    실제 탱크 이미지에서는 MSP 점수가 임계값보다
+    높아 ID로 잘못 판단했지만, Energy 점수는
+    임계값보다 낮아 OOD로 탐지했습니다.
+
+    이 차이가 왜 발생했는지는
+    뒤에서 실제 Logit을 통해 살펴보겠습니다.
+  </aside>
+</section>
+
+  <!-- 10 장 구분 -->
+  <section class="slide section-break">
+    <div class="shell">
+      <span class="chapter-number">02 / 03</span>
+      <span class="accent-rule"></span>
+      <h2>실험 및 분석</h2>
+      <p>동일한 ResNet-18에서 MSP와 Energy를 비교</p>
+    </div>
+    <aside class="notes">
+      이제 두 점수를 실제로 구현해서
+      CIFAR-100과 SVHN의 OOD 탐지 성능을
+      비교한 결과를 보여드리겠습니다.
+    </aside>
+  </section>
+
+  <!-- 11 실험 구성 -->
+  <section class="slide">
+    <div class="shell">
+      <header class="heading">
+        <p class="kicker">EXPERIMENT SETUP</p>
+        <h2>실험 구성</h2>
+        <p>
+          같은 모델 출력에서 두 점수를 계산해
+          성능과 실패 사례를 비교했습니다.
+        </p>
+      </header>
+
+      <div class="train-flow">
+        <div>
+          <span>MODEL</span>
+          <strong>ResNet-18</strong>
+          <small>CIFAR-10으로 학습</small>
+        </div>
+        <i>→</i>
+        <div>
+          <span>OUTPUT</span>
+          <strong>Logit 10개</strong>
+          <small>분류기 출력</small>
+        </div>
+        <i>→</i>
+        <div class="flow-scores">
+          <strong>MSP</strong>
+          <strong>Energy</strong>
+          <small>같은 이미지에 각각 적용</small>
+        </div>
+      </div>
+
+      <div class="setup-cards">
+        <article>
+          <span>TRAIN</span>
+          <strong>CIFAR-10 50,000장</strong>
+          <p>10개 클래스로 분류기 학습</p>
+        </article>
+        <article>
+          <span>ID VALIDATION / TEST</span>
+          <strong>1,000 / 9,000장</strong>
+          <p>임계값 설정 / 독립 평가</p>
+        </article>
+        <article>
+          <span>OOD TEST</span>
+          <strong>CIFAR-100 · SVHN</strong>
+          <p>각각 10,000장 / 26,032장</p>
+        </article>
+      </div>
+
+      <p class="inline-summary">
+        이번 발표는 <strong>Seed 42·43</strong> 결과를 사용합니다.
+        Seed 44는 추가 확인 대상으로 남겼습니다.
+      </p>
+    </div>
+    <aside class="notes">
+      CIFAR-10 학습 데이터 5만 장으로 ResNet-18을 학습했습니다.
+
+      CIFAR-10 테스트 이미지 1만 장 중 1천 장은 Validation,
+      나머지 9천 장은 ID Test입니다.
+
+      OOD는 CIFAR-100 테스트 1만 장,
+      SVHN 테스트 26,032장입니다.
+
+      같은 모델의 Logit에서 MSP와 Energy를 각각 계산합니다.
+      발표 수치는 Seed 42와 43에서 얻은 결과입니다.
+    </aside>
+  </section>
+
+  <!-- 12 평가 지표 -->
+  <section class="slide">
+    <div class="shell">
+      <header class="heading">
+        <p class="kicker">EVALUATION METRICS</p>
+        <h2>평가 지표</h2>
+        <p>
+          전체 구별 성능과 특정 조건에서의 오수용률을
+          함께 확인했습니다.
+        </p>
+      </header>
+
+      <div class="metrics">
+        <article class="compact-panel">
+          <div class="panel-label">AUROC · HIGHER IS BETTER</div>
+          <h3>전체적인 구별 능력</h3>
+          <p>
+            ID에 더 높은 탐지 점수를 주고
+            OOD에 더 낮은 점수를 주는 능력을
+            <strong>모든 임계값에 걸쳐</strong> 평가합니다.
+          </p>
+          <div class="metric-example">
+            0.90 → 임의의 ID가 OOD보다 높은 점수를 받을 확률 약 90%
+          </div>
+        </article>
+
+        <article class="compact-panel green-panel">
+          <div class="panel-label">FPR95 · LOWER IS BETTER</div>
+          <h3>ID 95% 수용 시 오류</h3>
+          <p>
+            ID를 약 95% 받아들이도록 설정한 ROC 지점에서
+            <strong>OOD를 ID로 잘못 수용한 비율</strong>입니다.
+          </p>
+          <div class="metric-example">
+            30% → OOD 100장 중 약 30장을 ID로 오수용
+          </div>
+        </article>
+      </div>
+
+      <p class="inline-summary">
+        이후 이미지별 성공·실패 사례는
+        <strong>ID Validation 하위 5%</strong>로 정한
+        별도 고정 임계값을 사용합니다.
+        FPR95 임계값과는 다릅니다.
+      </p>
+    </div>
+    <aside class="notes">
+      AUROC는 ID 점수가 OOD 점수보다 높은 순서를
+      얼마나 잘 만드는지를 평가합니다.
+      1에 가까울수록 좋습니다.
+
+      FPR95는 ID를 95% 받아들일 때 OOD가 잘못
+      통과하는 비율로 낮을수록 좋습니다.
+
+      AUROC와 FPR95는 테스트 점수에서 계산합니다.
+      뒤에 나오는 각 이미지의 성공/실패는 ID Validation을
+      이용해 보정한 고정 임계값으로 구한 것이므로
+      구분해야 합니다.
+    </aside>
+  </section>
+
+  <!-- 13 탐지 성능 -->
+  <section class="slide">
+    <div class="shell">
+      <header class="heading">
+        <p class="kicker">EXPERIMENT RESULTS</p>
+        <h2>탐지 성능</h2>
+        <p>
+          Seed 42·43 단순 평균 · 단위 % ·
+          동일한 분류 모델 기반
+        </p>
+      </header>
+
+      <table class="result-table">
+        <thead>
+          <tr>
+            <th>OOD 데이터셋</th>
+            <th>방법</th>
+            <th>AUROC ↑</th>
+            <th>FPR95 ↓</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th rowspan="2">
+              CIFAR-100
+              <small>Near OOD</small>
+            </th>
+            <td>MSP</td>
+            <td class="best">87.50</td>
+            <td>59.05</td>
+          </tr>
+          <tr>
+            <td>Energy</td>
+            <td>86.66</td>
+            <td class="best">50.42</td>
+          </tr>
+
+          <tr class="section-row">
+            <th rowspan="2">
+              SVHN
+              <small>Far OOD</small>
+            </th>
+            <td>MSP</td>
+            <td>93.47</td>
+            <td>43.66</td>
+          </tr>
+          <tr>
+            <td>Energy</td>
+            <td class="best">94.01</td>
+            <td class="best">29.58</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="result-interpret">
+        <div>
+          <b>CIFAR-100</b>
+          <p>
+            MSP가 AUROC에서 소폭 우세하지만,
+            Energy가 FPR95에서는 낮습니다.
+          </p>
+        </div>
+        <div>
+          <b>SVHN</b>
+          <p>
+            Energy가 두 지표 모두 우세하며
+            특히 FPR95 차이가 큽니다.
+          </p>
+        </div>
+      </div>
+
+      <p class="inline-summary">
+        따라서
+        <strong>
+          Energy가 모든 상황에서 더 좋다고 결론 내릴 수는 없습니다.
+        </strong>
+      </p>
+    </div>
+    <aside class="notes">
+      CIFAR-100에서 MSP의 AUROC는 87.50%,
+      Energy는 86.66%입니다.
+
+      반면 FPR95는 MSP 59.05%, Energy 50.42%로
+      Energy가 낮습니다.
+
+      SVHN에서는 Energy가 AUROC와 FPR95 모두 유리했습니다.
+
+      그러므로 Energy가 무조건 우수하다고 말하기 어렵고,
+      평가 기준에 따라 결과가 달라집니다.
+
+      Seed 두 개의 단순 평균이므로 통계적 유의성을
+      주장할 수도 없습니다.
+    </aside>
+  </section>
+
+  <!-- 14 이미지별 판정 차이 -->
+  <section class="slide">
+    <div class="shell compact-shell">
+      <header class="heading">
+        <p class="kicker">PER-IMAGE ANALYSIS</p>
+        <h2>이미지별 판정 차이</h2>
+        <p>
+          CIFAR-100 · Seed 43 ·
+          ID Validation으로 설정한 고정 임계값 사용
+        </p>
+      </header>
+
+      <div class="disagree">
+        <article class="accent-top">
+          <span>ENERGY만 탐지 성공</span>
+          <strong>1,223장</strong>
+          <p>MSP는 ID로 받아들였지만 Energy는 OOD로 거부</p>
+        </article>
+        <article>
+          <span>MSP만 탐지 성공</span>
+          <strong>473장</strong>
+          <p>Energy는 ID로 받아들였지만 MSP는 OOD로 거부</p>
+        </article>
+      </div>
+
+      <div class="stacked-bar">
+        <span style="width:33.94%;background:#94afd9"></span>
+        <span style="width:12.23%;background:#2563eb"></span>
+        <span style="width:4.73%;background:#82c4b5"></span>
+        <span style="width:49.10%;background:#edb09a"></span>
+      </div>
+
+      <div class="bar-legend">
+        <span>
+          <i style="background:#94afd9"></i>
+          둘 다 성공 · 3,394
+        </span>
+        <span>
+          <i style="background:#2563eb"></i>
+          Energy만 성공 · 1,223
+        </span>
+        <span>
+          <i style="background:#82c4b5"></i>
+          MSP만 성공 · 473
+        </span>
+        <span>
+          <i style="background:#edb09a"></i>
+          둘 다 실패 · 4,910
+        </span>
+      </div>
+
+      <p class="inline-summary">
+        두 점수는
+        <strong>
+          같은 이미지를 항상 같은 방식으로 판단하지는 않았습니다.
+        </strong>
+        다음은 실제 사례입니다.
+      </p>
+    </div>
+    <aside class="notes">
+      Seed 43의 CIFAR-100 OOD 1만 장을 비교했습니다.
+
+      두 방법 모두 성공한 이미지는 3,394장,
+      둘 다 실패는 4,910장입니다.
+
+      Energy만 성공은 1,223장,
+      MSP만 성공은 473장입니다.
+
+      검증셋으로 고정한 임계값을 적용한 결과입니다.
+
+      따라서 서로 다른 이미지를 탐지한다는 관찰을 할 수 있고,
+      왜 그런지 실제 Logit을 살펴보았습니다.
+    </aside>
+  </section>
+
+  <!-- 15 실제 이미지 비교 -->
+  <section class="slide">
+    <div class="shell">
+      <header class="heading">
+        <p class="kicker">CASE STUDY · SEED 43</p>
+        <h2>실제 이미지 비교</h2>
+        <p>
+          MSP가 거의 같은 ID와 OOD 이미지를 골라
+          각 점수의 판정을 확인했습니다.
+        </p>
+      </header>
+
+      <div class="cases">
+        <article class="compact-panel">
+          <div class="panel-label">ID · CIFAR-10</div>
+
+          <div class="case-identity">
+            <img src="assets/id_airplane_tank.jpg" alt="비행기">
+            <div>
+              <h3>비행기</h3>
+              <span>예측: 비행기</span>
+            </div>
+          </div>
+
+          <div class="case-values">
+            <span>MSP <b>0.980722</b></span>
+            <span>Energy <b>5.990721</b></span>
+          </div>
+
+          <p class="decision">
+            MSP: ID 수용 <span>·</span> Energy: ID 수용
+          </p>
+        </article>
+
+        <article class="compact-panel orange-panel">
+          <div class="panel-label">OOD · CIFAR-100</div>
+
+          <div class="case-identity">
+            <img src="assets/ood_airplane_tank.jpg" alt="탱크">
+            <div>
+              <h3>탱크</h3>
+              <span>예측: 비행기</span>
+            </div>
+          </div>
+
+          <div class="case-values">
+            <span>MSP <b>0.980775</b></span>
+            <span>Energy <b>5.918490</b></span>
+          </div>
+
+          <p class="decision mixed">
+            MSP: ID 오수용 <span>·</span> Energy: OOD 거부
+          </p>
+        </article>
+      </div>
+
+      <div class="thresholds">
+        <span>MSP 임계값 <b>0.837584</b></span>
+        <span>Energy 임계값 <b>5.956187</b></span>
+        <small>점수가 임계값 이상이면 ID로 수용</small>
+      </div>
+    </div>
+    <aside class="notes">
+      두 이미지는 모두 비행기로 예측됐습니다.
+
+      MSP가 비행기 0.980722, 탱크 0.980775로 거의 동일하고
+      탱크가 아주 조금 더 높았습니다.
+
+      두 점수 모두 임계값보다 높아
+      MSP는 둘 다 ID로 받아들였습니다.
+
+      Energy는 ID 비행기 5.9907, 탱크 5.9185였고,
+      5.9562 임계값을 기준으로 탱크만 OOD로 거부했습니다.
+
+      이 사례는 일부러 선택한 경계 사례이며
+      전체 데이터의 대표 예시는 아닙니다.
+    </aside>
+  </section>
+
+  <!-- 16 Logit 분석 -->
+  <section class="slide">
+    <div class="shell compact-shell">
+      <header class="heading">
+        <p class="kicker">LOGIT ANALYSIS</p>
+        <h2>Logit 분석</h2>
+        <p>
+          MSP가 비슷한 두 이미지에 서로 다른 Energy 점수가
+          나온 이유를 수식으로 확인했습니다.
+        </p>
+      </header>
+
+      <table class="logit-table">
+        <thead>
+          <tr>
+            <th>이미지</th>
+            <th>최대 Logit</th>
+            <th>MSP</th>
+            <th>Energy</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>ID 비행기</th>
+            <td>5.9713</td>
+            <td>0.980722</td>
+            <td>5.990721</td>
+          </tr>
+          <tr>
+            <th>OOD 탱크</th>
+            <td>5.8991</td>
+            <td>0.980775</td>
+            <td>5.918490</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="identity-formula">
+        <span>두 점수의 관계 · T=1</span>
+        <div class="display-math">
+          <math display="block">
+            <msub><mi>S</mi><mtext>Energy</mtext></msub>
+            <mo>=</mo>
+            <msub><mi>z</mi><mtext>max</mtext></msub>
+            <mo>−</mo>
+            <mi>log</mi>
+            <mo>(</mo>
+            <msub><mi>S</mi><mtext>MSP</mtext></msub>
+            <mo>)</mo>
+          </math>
+        </div>
+        <p>
+          MSP가 거의 같으므로 이번 점수 차이는
+          <strong>최대 Logit 차이(약 0.072)</strong>와
+          거의 일치합니다.
+        </p>
+      </div>
+
+      <p class="inline-summary">
+        실제 사례의 <strong>점수 차이는 설명</strong>할 수 있지만,
+        이 한 사례로 전체 성능 차이의 원인을 확정하지는 못합니다.
+      </p>
+    </div>
+    <aside class="notes">
+      MSP와 Energy는 수학적으로 이렇게 연결됩니다.
+      Energy는 최대 Logit에서 log MSP를 뺀 값입니다.
+
+      두 이미지의 MSP는 거의 같으므로 log MSP 항도
+      거의 같습니다.
+
+      그런데 최대 Logit은 비행기 5.9713과
+      탱크 5.8991로 차이가 있습니다.
+
+      그 결과 Energy 점수도 약 0.072 차이가 났고
+      임계값 기준으로 다른 판정이 내려졌습니다.
+
+      이는 일부 사례에 대한 설명이지
+      Energy가 전반적으로 더 나은 이유를
+      완전히 입증한 것은 아닙니다.
+    </aside>
+  </section>
+
+  <!-- 17 장 구분 -->
+  <section class="slide section-break">
+    <div class="shell">
+      <span class="chapter-number">03 / 03</span>
+      <span class="accent-rule"></span>
+      <h2>정리 및 다음 단계</h2>
+      <p>비교 실험을 정리하고 후속 검증을 계획</p>
+    </div>
+    <aside class="notes">
+      이제 이번 주에 확인한 사실과 한계,
+      다음 주에 진행할 분석을 정리하겠습니다.
+    </aside>
+  </section>
+
+  <!-- 18 결론 및 다음 주 -->
+  <section class="slide">
+    <div class="shell">
+      <header class="heading">
+        <p class="kicker">SUMMARY · NEXT WEEK</p>
+        <h2>정리 및 다음 주 계획</h2>
+        <p>
+          현재는 방법 간 차이를 확인한 단계이며,
+          실패 원인을 더 검증할 예정입니다.
+        </p>
+      </header>
+
+      <div class="closing-columns">
+        <article class="compact-panel">
+          <div class="panel-label">이번 주 결과</div>
+          <h3>MSP와 Energy 비교</h3>
+          <p>
+            두 방법의 성능과 성공 이미지가 달랐고,
+            실제 Logit 분석에서
+            <strong>MSP가 반영하지 못하는 크기 차이</strong>가
+            Energy 점수에 나타나는 사례를 확인했습니다.
+          </p>
+          <p class="caveat">
+            다만 전체 성능 차이의 원인을 규명한 것은 아닙니다.
+          </p>
+        </article>
+
+        <article class="compact-panel green-panel">
+          <div class="panel-label">다음 주 계획</div>
+          <h3>1차 비교 마무리</h3>
+          <ol>
+            <li>Seed 44 결과까지 확인</li>
+            <li>MSP만 성공한 반대 사례 분석</li>
+            <li>반복 관찰된 특징과 한계 정리</li>
+          </ol>
+        </article>
+      </div>
+
+      <p class="research-direction">
+        <b>연구 방향</b>
+        교수님이 제안한 OOD 응용 프로젝트도 검토하겠습니다.
+        다만 우선은 기존 탐지 방법의
+        <strong>실패 조건과 개선 가능성</strong>을
+        분석하는 방법론 중심으로 진행할 계획입니다.
+      </p>
+    </div>
+    <aside class="notes">
+      이번 주에는 MSP와 Energy의 성능 차이를 확인했고,
+      같은 수준의 MSP에도 Energy는 달리 점수를 계산할 수
+      있음을 실제 Logit 사례로 보였습니다.
+
+      그러나 이 현상이 전체 데이터에서 성능 차이를 만드는
+      원인인지까지 증명하지는 못했습니다.
+
+      다음 주에는 Seed 44 평가, 반대 사례 분석을 마쳐
+      두 Baseline 비교를 정리하겠습니다.
+
+      지난번 교수님이 OOD를 응용 프로젝트에 적용해보라는
+      제안을 주셨는데, 응용 가능성도 검토하되 현재는
+      탐지 방법이 실패하는 조건을 분석하고 개선하는
+      방법론에 관심이 있습니다.
+    </aside>
+  </section>
+
+  <!-- 19 감사합니다 -->
+  <section class="slide thank-you">
+    <div class="shell">
+      <p class="kicker">AI RESEARCH EXPLORATION · WEEK 02</p>
+      <h2>감사합니다</h2>
+      <span class="accent-rule"></span>
+      <p>OOD Detection · MSP와 Energy 비교</p>
+      <small>202544030 이현서</small>
+    </div>
+    <aside class="notes">
+      발표를 마치겠습니다. 감사합니다.
+    </aside>
+  </section>
+
+</main>
+
+<div class="navigation" role="group" aria-label="발표 조작">
+  <button id="prev" aria-label="이전 장">←</button>
+  <span id="counter">01 / 19</span>
+  <button id="next" aria-label="다음 장">→</button>
+  <button id="note-toggle">메모 N</button>
+  <button id="fullscreen">전체화면 F</button>
+</div>
+
+<div class="progress-track">
+  <div id="progress"></div>
+</div>
+
+<div class="speaker-notes" id="speaker-notes" hidden>
+  <b>발표자 메모</b>
+  <button id="note-close" aria-label="메모 닫기">×</button>
+  <p id="note-content"></p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1887 @@
+
+:root {
+  --blue:#2563eb;
+  --blue-dark:#1d4ed8;
+  --ink:#141b2b;
+  --body:#344256;
+  --muted:#687991;
+  --line:#dce4ee;
+  --soft:#f6f8fb;
+  --blue-soft:#eef4ff;
+  --green:#0d8d78;
+  --orange:#ed7b45;
+}
+
+* { box-sizing:border-box; }
+
+html,body {
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+
+body {
+  font-family:Pretendard,'Noto Sans KR','Malgun Gothic',
+    system-ui,sans-serif;
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+}
+
+h1,h2,h3,p { margin:0; }
+button { font:inherit; }
+strong,b { font-weight:800; }
+
+.deck {
+  position:fixed;
+  inset:0;
+  background:white;
+}
+
+.slide {
+  position:absolute;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:42px clamp(42px,5.1vw,98px) 65px;
+  background:white;
+  overflow:auto;
+}
+
+.slide.active { display:flex; }
+
+.shell {
+  width:min(1420px,100%);
+  margin:auto;
+}
+
+.compact-shell { max-width:1270px; }
+.notes { display:none; }
+
+.kicker {
+  font-size:13px;
+  color:var(--blue);
+  letter-spacing:1.2px;
+  font-weight:900;
+}
+
+.heading { margin-bottom:34px; }
+
+.heading h2 {
+  font-size:clamp(35px,2.7vw,49px);
+  line-height:1.14;
+  letter-spacing:-1.6px;
+  margin:9px 0 11px;
+  font-weight:850;
+}
+
+.heading > p:last-child {
+  font-size:clamp(16px,1.07vw,19px);
+  color:var(--muted);
+  line-height:1.5;
+}
+
+.shell h3 {
+  font-size:clamp(20px,1.48vw,27px);
+  line-height:1.3;
+  letter-spacing:-.5px;
+}
+
+.shell p { line-height:1.55; }
+
+.inline-summary {
+  text-align:center;
+  border-top:1px solid var(--line);
+  padding-top:19px;
+  margin-top:23px;
+  font-size:17px;
+  line-height:1.6;
+  color:var(--body);
+}
+
+.inline-summary strong { color:var(--blue-dark); }
+
+.accent-rule {
+  display:block;
+  width:57px;
+  height:5px;
+  background:var(--blue);
+  margin:27px 0 31px;
+}
+
+/* 01. 표지 */
+
+.cover-grid {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:40px;
+}
+
+.cover-grid > div:first-child {
+  position:relative;
+  z-index:2;
+}
+
+h1 {
+  font-size:clamp(58px,5vw,84px);
+  line-height:1.12;
+  font-weight:880;
+  letter-spacing:-3px;
+}
+
+h1 em {
+  display:block;
+  color:var(--blue);
+  font-style:normal;
+}
+
+.subtitle {
+  margin-top:24px;
+  color:var(--body);
+  font-size:21px;
+}
+
+.byline {
+  margin-top:60px;
+  color:var(--muted);
+  font-size:15px;
+  font-weight:750;
+}
+
+.byline span { padding:0 9px; }
+
+.cover-art {
+  flex:0 0 clamp(310px,31vw,490px);
+  width:clamp(310px,31vw,490px);
+  height:clamp(310px,31vw,490px);
+  background:#f7faff;
+  border:2px solid #bdd6ff;
+  border-radius:50%;
+  position:relative;
+}
+
+.ring {
+  position:absolute;
+  border-radius:50%;
+  border:2px dashed #bcd5ff;
+}
+
+.ring-one { inset:16%; }
+.ring-two { inset:32%; }
+
+.spot {
+  width:19px;
+  height:19px;
+  position:absolute;
+  border-radius:50%;
+  background:var(--blue);
+  box-shadow:0 0 0 9px #e4eeff;
+}
+
+.spot-a { left:15%; top:35%; }
+.spot-b { left:70%; top:25%; }
+.spot-c { left:28%; top:67%; }
+
+.spot-d {
+  left:70%;
+  top:68%;
+  background:var(--orange);
+  box-shadow:0 0 0 9px #fff0e7;
+}
+
+.cover-art b {
+  position:absolute;
+  left:0;
+  top:46%;
+  width:100%;
+  text-align:center;
+  color:var(--blue);
+  font-size:21px;
+}
+
+.cover-art b small {
+  color:var(--muted);
+  font-size:13px;
+}
+
+/* 02. 목차 */
+
+.toc {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px 64px;
+}
+
+.toc article {
+  display:grid;
+  grid-template-columns:58px 1fr;
+  align-items:start;
+  padding:25px 0;
+  border-bottom:1px solid var(--line);
+}
+
+.toc b {
+  color:var(--blue);
+  font-size:17px;
+}
+
+.toc h3 { font-size:25px; }
+
+.toc p {
+  color:var(--muted);
+  font-size:16px;
+  margin-top:8px;
+}
+
+/* 03. 지난주와 이번 주 */
+
+.recap-pair {
+  display:grid;
+  grid-template-columns:1fr 55px 1fr;
+  align-items:center;
+  gap:20px;
+}
+
+.recap-pair article {
+  border-top:4px solid #aebdd0;
+  background:var(--soft);
+  padding:28px 34px 31px;
+  min-height:195px;
+}
+
+.recap-pair article.accent-top {
+  border-color:var(--blue);
+  background:var(--blue-soft);
+}
+
+.recap-pair article > span {
+  color:var(--blue);
+  font-weight:850;
+  font-size:13px;
+}
+
+.recap-pair h3 { margin:15px 0 13px; }
+
+.recap-pair p {
+  font-size:17px;
+  color:var(--body);
+}
+
+.connect-arrow {
+  color:#a1afc0;
+  font-size:34px;
+  text-align:center;
+}
+
+.callout {
+  background:#edf4ff;
+  border-left:4px solid var(--blue);
+  margin-top:27px;
+  padding:20px 25px;
+  font-size:18px;
+  color:var(--body);
+}
+
+.callout b {
+  color:var(--blue);
+  margin-right:18px;
+}
+
+/* 04. ID/OOD, 비교 카드 */
+
+.ood-pair,
+.methods,
+.metrics,
+.cases,
+.closing-columns {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:32px;
+}
+
+.compact-panel {
+  background:var(--soft);
+  border-top:3px solid #9fb5d0;
+  padding:25px 29px;
+}
+
+.orange-panel { border-top-color:var(--orange); }
+.green-panel { border-top-color:var(--green); }
+
+.panel-label {
+  color:var(--blue);
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.45px;
+}
+
+.orange-panel .panel-label { color:#c75a2e; }
+.green-panel .panel-label { color:var(--green); }
+
+.compact-panel h3 {
+  margin-top:12px;
+  margin-bottom:18px;
+}
+
+.compact-panel > p {
+  margin-top:17px;
+  color:var(--body);
+  font-size:16px;
+}
+
+.classes {
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:10px;
+}
+
+.classes span {
+  text-align:center;
+  font-weight:780;
+  font-size:16px;
+  background:white;
+  border:1px solid #dbe5f0;
+  border-radius:6px;
+  padding:13px 3px;
+}
+
+.panel-explain {
+  border-top:1px solid var(--line);
+  padding-top:15px;
+}
+
+.tank-row {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:25px;
+  min-height:111px;
+}
+
+.tank-row img {
+  width:116px;
+  height:116px;
+  object-fit:cover;
+  border-radius:7px;
+}
+
+.tank-row b {
+  display:block;
+  font-size:22px;
+}
+
+.tank-row small {
+  display:block;
+  color:var(--muted);
+  font-size:15px;
+  margin:6px 0 11px;
+}
+
+.tank-row strong {
+  color:#bd5630;
+  font-size:16px;
+}
+
+/* 장 구분 */
+
+.section-break { background:var(--soft); }
+
+.section-break:before {
+  content:'';
+  position:absolute;
+  inset:0 auto 0 0;
+  width:8px;
+  background:var(--blue);
+}
+
+.section-break .shell { max-width:1050px; }
+
+.chapter-number {
+  color:var(--blue);
+  font-size:17px;
+  font-weight:900;
+  letter-spacing:1px;
+}
+
+.section-break h2 {
+  font-size:clamp(54px,5.2vw,92px);
+  line-height:1.14;
+  letter-spacing:-2px;
+}
+
+.section-break .shell > p {
+  margin-top:19px;
+  font-size:22px;
+  color:var(--muted);
+}
+
+/* 06. Logit */
+
+.logit-demo {
+  display:grid;
+  grid-template-columns:31% 1fr;
+  gap:55px;
+  align-items:center;
+}
+
+.image-tile { text-align:center; }
+
+.image-tile img {
+  width:clamp(155px,14vw,220px);
+  height:clamp(155px,14vw,220px);
+  object-fit:cover;
+  display:block;
+  margin:0 auto 15px;
+  border-radius:7px;
+}
+
+.image-tile strong {
+  font-size:21px;
+  display:block;
+}
+
+.image-tile span {
+  color:var(--muted);
+  font-size:15px;
+  display:block;
+  margin-top:6px;
+}
+
+.logit-list { padding-top:6px; }
+
+.logit-row {
+  display:grid;
+  grid-template-columns:100px 1fr 85px;
+  gap:18px;
+  align-items:center;
+  margin:18px 0;
+  font-size:17px;
+  font-weight:780;
+}
+
+.logit-row .meter {
+  height:19px;
+  background:#e6edf5;
+  border-radius:5px;
+  overflow:hidden;
+}
+
+.logit-row .meter i {
+  display:block;
+  background:var(--blue);
+  height:100%;
+}
+
+.logit-row > b {
+  text-align:right;
+  font-size:19px;
+  color:var(--blue);
+}
+
+.logit-row.light-row { color:var(--muted); }
+
+.logit-row .muted-meter {
+  background:transparent;
+  color:var(--muted);
+  font-size:14px;
+  font-weight:500;
+}
+
+.diagram-caption {
+  border-top:1px solid var(--line);
+  margin-top:20px;
+  padding-top:21px;
+  color:var(--body);
+  font-size:17px;
+}
+
+/* 07. Softmax */
+
+.formula-inline {
+  padding:12px 25px 16px;
+  background:var(--blue-soft);
+  text-align:center;
+  width:min(660px,100%);
+  margin:0 auto 24px;
+}
+
+.formula-inline .display-math { font-size:26px; }
+
+.formula-inline span {
+  color:var(--muted);
+  font-size:15px;
+}
+
+.display-math {
+  font-size:clamp(23px,1.8vw,32px);
+  text-align:center;
+}
+
+.display-math math {
+  font-family:"Cambria Math","STIX Two Math",serif;
+  font-size:1.32em;
+  margin:auto;
+}
+
+.softmax-demo {
+  display:grid;
+  grid-template-columns:1fr 45px 1fr;
+  gap:20px;
+  align-items:center;
+  max-width:1080px;
+  margin:0 auto;
+}
+
+.softmax-demo article {
+  border-top:2px solid var(--line);
+  padding:16px 12px 0;
+  text-align:center;
+}
+
+.softmax-demo article > span,
+.example-compare article > span {
+  color:var(--blue);
+  font-size:13px;
+  font-weight:900;
+}
+
+.softmax-demo h3 {
+  font-size:32px;
+  margin:11px 0 18px;
+}
+
+.probbar {
+  background:#dbe4f0;
+  display:flex;
+  height:39px;
+  border-radius:5px;
+  overflow:hidden;
+  font-weight:850;
+}
+
+.probbar b {
+  background:var(--blue);
+  color:#fff;
+  width:88.08%;
+  display:grid;
+  place-items:center;
+}
+
+.probbar em {
+  font-style:normal;
+  flex:1;
+  display:grid;
+  place-items:center;
+  font-size:13px;
+}
+
+.softmax-demo article p {
+  color:var(--muted);
+  font-size:14px;
+  margin-top:9px;
+}
+
+.equals {
+  font-size:37px;
+  font-weight:900;
+  text-align:center;
+  color:var(--blue);
+}
+
+/* 08. MSP와 Energy */
+
+.methods .compact-panel { padding:22px 28px; }
+
+.methods .compact-panel h3 {
+  font-size:26px;
+  margin:10px 0 7px;
+}
+
+.methods .compact-panel .display-math {
+  font-size:clamp(20px,1.55vw,27px);
+  min-height:99px;
+  display:grid;
+  place-items:center;
+}
+
+.methods .compact-panel p {
+  margin-top:3px;
+  font-size:17px;
+}
+
+/* 09. 점수 예시 */
+
+.example-compare {
+  display:grid;
+  grid-template-columns:1fr 56px 1fr;
+  gap:20px;
+  align-items:center;
+}
+
+.example-compare article {
+  background:var(--soft);
+  border-top:3px solid #b9c9e0;
+  padding:21px 32px;
+}
+
+.example-compare h3 {
+  font-size:32px;
+  margin:11px 0 18px;
+}
+
+.value-line {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-top:1px solid var(--line);
+  padding:12px 0;
+}
+
+.value-line small {
+  font-size:16px;
+  color:var(--muted);
+}
+
+.value-line strong { font-size:26px; }
+.value-line.emphasis strong { color:var(--blue); }
+
+.versus {
+  text-align:center;
+  font-weight:850;
+  color:var(--muted);
+}
+
+.explain-lines {
+  margin-top:25px;
+  display:grid;
+  gap:10px;
+}
+
+.explain-lines p {
+  padding:11px 0;
+  border-bottom:1px solid var(--line);
+  font-size:17px;
+  color:var(--body);
+}
+
+.explain-lines b {
+  display:inline-block;
+  width:100px;
+  color:var(--blue);
+}
+
+/* 11. 실험 구성 */
+
+.train-flow {
+  display:grid;
+  grid-template-columns:1fr 40px 1fr 40px 1fr;
+  align-items:center;
+  gap:14px;
+  margin-bottom:30px;
+}
+
+.train-flow > div {
+  background:var(--soft);
+  border-top:3px solid #a7bbd3;
+  text-align:center;
+  padding:17px 16px;
+}
+
+.train-flow > div:first-child {
+  border-top-color:var(--blue);
+  background:var(--blue-soft);
+}
+
+.train-flow > i {
+  font-style:normal;
+  color:#9dabbe;
+  text-align:center;
+  font-size:29px;
+}
+
+.train-flow span {
+  font-size:12px;
+  font-weight:850;
+  color:var(--blue);
+  display:block;
+}
+
+.train-flow strong {
+  font-size:23px;
+  display:block;
+  margin:8px 0;
+}
+
+.train-flow small {
+  color:var(--muted);
+  font-size:14px;
+}
+
+.train-flow .flow-scores strong {
+  display:inline-block;
+  margin:0 5px;
+  color:var(--blue);
+}
+
+.train-flow .flow-scores small {
+  display:block;
+  margin-top:9px;
+}
+
+.setup-cards {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:22px;
+}
+
+.setup-cards article {
+  border-top:2px solid var(--line);
+  padding:15px 10px 10px;
+}
+
+.setup-cards span {
+  font-size:13px;
+  font-weight:850;
+  color:var(--blue);
+}
+
+.setup-cards strong {
+  display:block;
+  font-size:23px;
+  margin:11px 0;
+}
+
+.setup-cards p {
+  color:var(--muted);
+  font-size:15px;
+}
+
+/* 12. 평가 지표 */
+
+.metrics .compact-panel { padding:24px 32px; }
+
+.metrics .compact-panel h3 {
+  margin:14px 0;
+}
+
+.metrics .compact-panel p { font-size:17px; }
+
+.metric-example {
+  margin-top:21px;
+  padding:14px 16px;
+  color:var(--blue-dark);
+  background:#e9f0fe;
+  font-size:16px;
+  font-weight:750;
+  line-height:1.5;
+}
+
+.green-panel .metric-example {
+  background:#e6f7f3;
+  color:var(--green);
+}
+
+/* 13. 성능 표 */
+
+.result-table,
+.logit-table {
+  border-collapse:collapse;
+  width:100%;
+  font-variant-numeric:tabular-nums;
+  text-align:center;
+}
+
+.result-table thead,
+.logit-table thead {
+  background:#edf4ff;
+  color:var(--blue);
+}
+
+.result-table th,
+.result-table td {
+  padding:14px 18px;
+  border-bottom:1px solid var(--line);
+  font-size:19px;
+}
+
+.result-table thead th {
+  font-size:15px;
+  font-weight:850;
+}
+
+.result-table tbody th {
+  text-align:left;
+  width:26%;
+  font-size:23px;
+}
+
+.result-table tbody th small {
+  display:block;
+  color:var(--muted);
+  font-weight:500;
+  font-size:13px;
+  margin-top:4px;
+}
+
+.result-table tbody td { font-weight:650; }
+
+.result-table .best {
+  font-weight:900;
+  color:var(--blue);
+}
+
+.result-table tbody .section-row {
+  border-top:3px solid #dce6f4;
+}
+
+.result-interpret {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:30px;
+  margin-top:19px;
+}
+
+.result-interpret > div {
+  border-left:3px solid #c6d6ed;
+  padding-left:16px;
+}
+
+.result-interpret b {
+  color:var(--blue);
+  font-size:16px;
+}
+
+.result-interpret p {
+  color:var(--body);
+  font-size:15px;
+  margin-top:5px;
+}
+
+/* 14. 이미지별 판정 차이 */
+
+.disagree {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:26px;
+}
+
+.disagree article {
+  background:var(--soft);
+  border-top:3px solid #aabdd3;
+  padding:19px 26px;
+}
+
+.disagree article.accent-top {
+  background:var(--blue-soft);
+  border-color:var(--blue);
+}
+
+.disagree span {
+  display:block;
+  font-size:15px;
+  color:var(--blue);
+  font-weight:900;
+}
+
+.disagree strong {
+  display:block;
+  font-size:40px;
+  color:var(--blue);
+  margin:10px 0 6px;
+}
+
+.disagree article+article strong { color:var(--ink); }
+
+.disagree p {
+  color:var(--body);
+  font-size:16px;
+}
+
+.stacked-bar {
+  display:flex;
+  height:34px;
+  margin:28px 0 15px;
+  width:100%;
+  overflow:hidden;
+  border-radius:4px;
+}
+
+.stacked-bar span { height:100%; }
+
+.bar-legend {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  gap:12px;
+  font-size:14px;
+  color:var(--body);
+}
+
+.bar-legend i {
+  display:inline-block;
+  width:13px;
+  height:13px;
+  vertical-align:-1px;
+  margin-right:7px;
+}
+
+/* 15. 실제 이미지 */
+
+.case-identity {
+  display:flex;
+  align-items:center;
+  gap:23px;
+}
+
+.case-identity img {
+  width:135px;
+  height:135px;
+  border-radius:7px;
+  object-fit:cover;
+}
+
+.case-identity h3 {
+  font-size:28px;
+  margin:0 0 9px;
+}
+
+.case-identity span {
+  color:var(--muted);
+  font-size:16px;
+}
+
+.case-values {
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  border-top:1px solid var(--line);
+  padding-top:18px;
+  margin-top:18px;
+}
+
+.case-values span {
+  font-size:16px;
+  color:var(--muted);
+}
+
+.case-values b {
+  margin-left:11px;
+  color:var(--ink);
+  font-size:20px;
+}
+
+.compact-panel .decision {
+  background:#e4efff;
+  color:var(--blue-dark);
+  text-align:center;
+  font-weight:850;
+  padding:12px;
+  font-size:15px;
+  margin-top:18px;
+}
+
+.compact-panel .decision.mixed {
+  background:#fff0e8;
+  color:#b84e2b;
+}
+
+.decision span {
+  color:#9ca9b8;
+  margin:0 8px;
+}
+
+.thresholds {
+  display:flex;
+  justify-content:center;
+  gap:42px;
+  align-items:center;
+  margin-top:22px;
+  font-size:15px;
+  color:var(--body);
+}
+
+.thresholds b {
+  color:var(--blue);
+  margin-left:6px;
+  font-size:19px;
+}
+
+.thresholds small {
+  font-size:14px;
+  color:var(--muted);
+}
+
+/* 16. Logit 분석 */
+
+.logit-table th,
+.logit-table td {
+  border-bottom:1px solid var(--line);
+  padding:15px;
+  font-size:21px;
+}
+
+.logit-table thead th { font-size:15px; }
+
+.logit-table tbody th { text-align:left; }
+
+.logit-table tbody td:last-child {
+  color:var(--blue);
+  font-weight:900;
+}
+
+.identity-formula {
+  background:var(--blue-soft);
+  text-align:center;
+  padding:15px 30px;
+  margin-top:27px;
+}
+
+.identity-formula > span {
+  font-size:13px;
+  font-weight:900;
+  color:var(--blue);
+}
+
+.identity-formula .display-math { font-size:27px; }
+
+.identity-formula p {
+  color:var(--body);
+  font-size:17px;
+}
+
+/* 18. 정리 */
+
+.closing-columns .compact-panel { padding:24px 30px; }
+
+.closing-columns p {
+  font-size:17px;
+  margin-top:12px;
+}
+
+.closing-columns .caveat {
+  color:#9d5736;
+  border-top:1px solid var(--line);
+  padding-top:13px;
+}
+
+.closing-columns ol {
+  margin:15px 0 0;
+  padding-left:25px;
+  color:var(--body);
+  font-size:18px;
+  line-height:2.2;
+}
+
+.research-direction {
+  background:var(--blue-soft);
+  padding:18px 23px;
+  margin-top:25px;
+  color:var(--body);
+  font-size:17px;
+}
+
+.research-direction b {
+  color:var(--blue);
+  margin-right:16px;
+}
+
+/* 19. 감사합니다 */
+
+.thank-you .shell { text-align:center; }
+
+.thank-you h2 {
+  font-size:clamp(76px,7vw,115px);
+  letter-spacing:-4px;
+  margin:15px 0 15px;
+}
+
+.thank-you .accent-rule { margin:24px auto; }
+
+.thank-you .shell > p:not(.kicker) {
+  font-size:20px;
+  color:var(--body);
+}
+
+.thank-you small {
+  display:block;
+  margin-top:35px;
+  font-size:15px;
+  color:var(--muted);
+}
+
+/* 하단 조작 */
+
+.navigation {
+  position:fixed;
+  right:18px;
+  bottom:16px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:#fffefa;
+  border:1px solid var(--line);
+  padding:6px;
+  border-radius:9px;
+  z-index:10;
+  box-shadow:0 6px 22px #141b2b15;
+}
+
+.navigation button {
+  height:33px;
+  border:1px solid var(--line);
+  background:white;
+  border-radius:6px;
+  color:var(--blue);
+  padding:0 11px;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.navigation button:disabled { opacity:.3; }
+
+#counter {
+  color:var(--muted);
+  font-size:13px;
+  min-width:58px;
+  text-align:center;
+}
+
+.progress-track {
+  height:4px;
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#edf2f8;
+  z-index:12;
+}
+
+#progress {
+  height:100%;
+  width:0;
+  background:var(--blue);
+  transition:width .15s;
+}
+
+/* 발표자 메모 */
+
+.speaker-notes {
+  position:fixed;
+  z-index:20;
+  bottom:68px;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(850px,90vw);
+  background:#121b2c;
+  border-radius:12px;
+  padding:20px 24px;
+  color:white;
+  box-shadow:0 15px 40px #0004;
+}
+
+.speaker-notes[hidden] { display:none; }
+
+.speaker-notes b {
+  color:#93c5fd;
+  font-size:14px;
+}
+
+.speaker-notes button {
+  float:right;
+  background:none;
+  border:0;
+  color:white;
+  font-size:23px;
+  cursor:pointer;
+}
+
+.speaker-notes p {
+  margin-top:12px;
+  color:#e7ebf4;
+  line-height:1.8;
+  font-size:16px;
+  max-height:35vh;
+  overflow:auto;
+}
+
+/* 낮은 높이 화면 */
+
+@media (max-height:760px) {
+  .slide {
+    padding-top:20px;
+    padding-bottom:52px;
+  }
+
+  .heading { margin-bottom:20px; }
+  .heading h2 { font-size:35px; }
+
+  .compact-panel { padding:18px 22px; }
+
+  .inline-summary {
+    margin-top:14px;
+    padding-top:12px;
+  }
+
+  .recap-pair article { padding:16px 25px; }
+
+  .formula-inline {
+    padding:6px;
+    margin-bottom:14px;
+  }
+
+  .result-table th,
+  .result-table td { padding:10px; }
+
+  .tank-row img {
+    width:96px;
+    height:96px;
+  }
+}
+
+/* 좁은 화면 */
+
+@media (max-width:950px) {
+  .cover-art {
+    opacity:.15;
+    position:absolute;
+    right:0;
+  }
+
+  .cover-grid { display:block; }
+
+  .ood-pair,
+  .methods,
+  .metrics,
+  .closing-columns,
+  .cases { gap:15px; }
+
+  .classes { grid-template-columns:repeat(2,1fr); }
+
+  .slide {
+    padding-left:26px;
+    padding-right:26px;
+  }
+
+  .train-flow { gap:5px; }
+
+  .case-identity img {
+    width:90px;
+    height:90px;
+  }
+
+  .thresholds { gap:12px; }
+  .logit-demo { gap:20px; }
+}
+
+/* 인쇄 */
+
+@media print {
+  @page {
+    size:landscape;
+    margin:0;
+  }
+
+  html,body {
+    overflow:visible;
+    height:auto;
+  }
+
+  .deck { position:static; }
+
+  .slide {
+    position:relative;
+    display:flex!important;
+    height:100vh;
+    page-break-after:always;
+    break-after:page;
+    overflow:hidden;
+  }
+
+  .navigation,
+  .progress-track,
+  .speaker-notes {
+    display:none!important;
+  }
+}
+
+
+
+/* ==========================================
+   LAYOUT FIX
+   제목 좌측 상단 / 콘텐츠 전체 폭 활용
+========================================== */
+
+/* 1. 슬라이드 전체를 중앙에 모으지 않음 */
+
+.slide {
+  align-items: initial;
+  justify-content: initial;
+
+  padding:
+    clamp(38px, 5.5vh, 62px)
+    clamp(48px, 4.6vw, 100px)
+    78px;
+}
+
+.slide.active {
+  display: block;
+}
+
+/* 기존 max-width와 margin:auto 해제 */
+
+.shell,
+.compact-shell {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+/* 2. 제목 위치 통일 */
+
+.heading {
+  margin: 0 0 clamp(28px, 5.2vh, 51px);
+  text-align: left;
+}
+
+.heading h2 {
+  font-size: clamp(38px, 3.05vw, 56px);
+}
+
+.heading > p:last-child {
+  font-size: clamp(17px, 1.15vw, 21px);
+}
+
+/* 3. 표지·챕터·마지막 장은 중앙 정렬 유지 */
+
+.slide:first-child.active,
+.section-break.active,
+.thank-you.active {
+  display: flex;
+  align-items: center;
+}
+
+.slide:first-child.active {
+  justify-content: space-between;
+}
+
+.section-break.active,
+.thank-you.active {
+  justify-content: center;
+}
+
+.slide:first-child .shell,
+.section-break .shell,
+.thank-you .shell {
+  margin: auto 0;
+}
+
+.section-break .shell {
+  max-width: none;
+  padding-left: 4vw;
+}
+
+.thank-you .shell {
+  text-align: center;
+}
+
+/* 4. 일반 박스 크기 조정 */
+
+.compact-panel {
+  padding:
+    clamp(18px, 1.6vw, 28px)
+    clamp(20px, 1.75vw, 32px);
+}
+
+.ood-pair,
+.methods,
+.metrics,
+.cases,
+.closing-columns {
+  gap: clamp(20px, 2.25vw, 42px);
+}
+
+/* 설명은 아래쪽 끝으로 밀지 않음 */
+
+.inline-summary {
+  margin-top: 28px;
+  padding-top: 16px;
+
+  font-size: clamp(17px, 1.15vw, 21px);
+  text-align: left;
+}
+
+/* ==========================================
+   지난주와 이번 주
+========================================== */
+
+.recap-pair {
+  margin-top: clamp(50px, 8vh, 85px);
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    45px
+    minmax(0, 1fr);
+
+  gap: clamp(14px, 1.6vw, 28px);
+}
+
+.recap-pair article {
+  min-height: 0;
+  padding: 25px 30px 27px;
+}
+
+.recap-pair h3 {
+  margin: 12px 0 9px;
+}
+
+.recap-pair p {
+  font-size: clamp(17px, 1.15vw, 21px);
+}
+
+/* 연구 목표를 카드 바로 아래에 배치 */
+
+.callout {
+  margin-top: 34px;
+  padding: 20px 27px;
+
+  font-size: clamp(18px, 1.2vw, 22px);
+}
+
+/* ==========================================
+   OOD Detection
+========================================== */
+
+.ood-pair {
+  align-items: start;
+  margin-top: 18px;
+}
+
+.ood-pair .compact-panel {
+  min-height: 0;
+}
+
+.ood-pair .compact-panel h3 {
+  margin-bottom: 17px;
+}
+
+.classes {
+  gap: 10px;
+}
+
+.classes span {
+  padding: 13px 4px;
+}
+
+/* 탱크 이미지와 텍스트를 좌측 정렬 */
+
+.tank-row {
+  justify-content: flex-start;
+  min-height: 0;
+
+  margin: 14px 0 7px;
+  gap: 24px;
+}
+
+.tank-row img {
+  width: 115px;
+  height: 115px;
+}
+
+/* 설명은 박스 내부 콘텐츠 바로 아래 */
+
+.ood-pair .panel-explain {
+  margin-top: 19px;
+  padding-top: 13px;
+
+  font-size: clamp(17px, 1.09vw, 20px);
+}
+
+/* ==========================================
+   나머지 슬라이드 간격 통일
+========================================== */
+
+.logit-demo,
+.softmax-demo,
+.example-compare,
+.train-flow,
+.methods,
+.metrics,
+.cases,
+.closing-columns {
+  margin-top: clamp(12px, 2vh, 25px);
+}
+
+.formula-inline {
+  margin-top: 4px;
+}
+
+.metrics .compact-panel,
+.methods .compact-panel {
+  min-height: 0;
+}
+
+.methods .compact-panel .display-math {
+  min-height: 85px;
+}
+
+.research-direction {
+  margin-top: 27px;
+}
+
+.recap-pair,
+.ood-pair,
+.methods,
+.metrics,
+.cases,
+.closing-columns,
+.train-flow,
+.setup-cards {
+  align-content: start;
+}
+
+/* ==========================================
+   화면 높이가 작은 경우
+========================================== */
+
+@media (max-height: 760px) {
+  .slide {
+    padding-top: 30px;
+    padding-bottom: 58px;
+  }
+
+  .heading {
+    margin-bottom: 22px;
+  }
+
+  .recap-pair {
+    margin-top: 28px;
+  }
+
+  .recap-pair article {
+    padding: 16px 23px;
+  }
+
+  .callout {
+    margin-top: 19px;
+    padding: 13px 20px;
+  }
+
+  .classes span {
+    padding: 9px 3px;
+  }
+
+  .ood-pair .panel-explain {
+    margin-top: 12px;
+  }
+
+  .inline-summary {
+    margin-top: 17px;
+    padding-top: 12px;
+  }
+}
+
+@media (max-width: 950px) {
+  .slide {
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+
+  .recap-pair {
+    gap: 12px;
+  }
+
+  .recap-pair article {
+    padding: 17px 18px;
+  }
+}
+
+
+/* 실험 구성 슬라이드: 제목 고정, 본문만 아래로 이동 */
+
+/* 제목 아래에서 파이프라인 시작 위치 조정 */
+.train-flow {
+  margin-top: clamp(90px, 14vh, 150px);
+}
+
+/* 파이프라인과 데이터 정보 사이 간격 */
+.setup-cards {
+  margin-top: 35px;
+}
+
+/* 하단 설명도 데이터 정보와 함께 배치 */
+.setup-cards + .inline-summary {
+  margin-top: 35px;
+}
+
+
+
+/* ==========================================
+   전체 슬라이드 세로 위치 조정
+========================================== */
+
+/* 일반 슬라이드: 전체 콘텐츠를 조금 아래로 */
+.slide:not(:first-child):not(.section-break):not(.thank-you) {
+  padding-top: clamp(80px, 10.5vh, 115px);
+}
+
+/* 목차: 일반 슬라이드보다 더 아래로 */
+.slide:nth-child(2) {
+  padding-top: clamp(150px, 19vh, 200px);
+}
+
+/* 기존 Logit 슬라이드의 높이 설정과 충돌 방지 */
+.slide:has(.logit-demo) .shell {
+  min-height: calc(100dvh - 220px);
+}
+
+/* 화면 높이가 작은 경우 */
+@media (max-height: 760px) {
+  .slide:not(:first-child):not(.section-break):not(.thank-you) {
+    padding-top: 65px;
+  }
+
+  .slide:nth-child(2) {
+    padding-top: 105px;
+  }
+
+  .slide:has(.logit-demo) .shell {
+    min-height: calc(100dvh - 150px);
+  }
+}
+
+
+
+/* 전체 슬라이드 세로 위치 추가 조정 */
+
+/* 일반 슬라이드 */
+.slide:not(:first-child):not(.section-break):not(.thank-you) {
+  padding-top: clamp(130px, 18vh, 170px);
+}
+
+/* 목차 슬라이드 */
+.slide:nth-child(2) {
+  padding-top: clamp(200px, 26vh, 250px);
+}
+
+/* Logit 슬라이드의 기존 중앙 배치 설정 보정 */
+.slide:has(.logit-demo) .shell {
+  min-height: calc(100dvh - 310px);
+}
+
+/* 낮은 해상도 대응 */
+@media (max-height: 760px) {
+  .slide:not(:first-child):not(.section-break):not(.thank-you) {
+    padding-top: 95px;
+  }
+
+  .slide:nth-child(2) {
+    padding-top: 145px;
+  }
+}
+
+
+/* 메인 페이지로 돌아가기 */
+
+.back-to-home {
+  position: fixed;
+  top: 18px;
+  left: 20px;
+  z-index: 1000;
+
+  display: inline-flex;
+  align-items: center;
+
+  padding: 8px 13px;
+  border: 1px solid #dce4ee;
+  border-radius: 7px;
+
+  background: rgba(255, 255, 255, 0.96);
+  color: #64748b;
+
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.back-to-home:hover {
+  color: #2563eb;
+  border-color: #bfdbfe;
+  background: #eff6ff;
+}
+
+/* 발표자료 인쇄 시 버튼 제외 */
+@media print {
+  .back-to-home {
+    display: none;
+  }
+}
+
+
+/* 임계값 설명 슬라이드 */
+
+.threshold-flow {
+  display: grid;
+  grid-template-columns: 1fr 44px 1fr;
+  align-items: center;
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.threshold-step {
+  background: #f6f8fb;
+  border-top: 3px solid #a9bed9;
+  padding: 22px 27px;
+}
+
+.threshold-step > span,
+.threshold-case-heading > span {
+  font-size: 13px;
+  color: #2563eb;
+  font-weight: 850;
+  letter-spacing: .4px;
+}
+
+.threshold-step h3 {
+  margin: 11px 0;
+  font-size: 24px;
+}
+
+.threshold-step p {
+  font-size: 17px;
+  color: #344256;
+}
+
+.threshold-step > small {
+  display: block;
+  margin-top: 12px;
+  color: #687991;
+  font-size: 14px;
+}
+
+.threshold-flow-arrow {
+  font-size: 30px;
+  text-align: center;
+  color: #a7b5c8;
+}
+
+.threshold-rules {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.threshold-rules > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 15px;
+  font-size: 16px;
+}
+
+.rule-id {
+  background: #e7f4ee;
+  color: #176b4b;
+}
+
+.rule-ood {
+  background: #fff0e9;
+  color: #b84e2b;
+}
+
+/* 실제 판정 예시 */
+
+.threshold-case-panel {
+  margin-top: 27px;
+}
+
+.threshold-case-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 13px;
+  border-bottom: 1px solid #dce4ee;
+}
+
+.threshold-case-heading h3 {
+  font-size: 20px;
+}
+
+.threshold-example-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 14px;
+}
+
+.threshold-example-grid article {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 17px 20px;
+  background: #f6f8fb;
+}
+
+.threshold-example-grid article > span {
+  color: #2563eb;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.threshold-example-grid p {
+  font-size: 16px;
+  color: #344256;
+}
+
+.threshold-example-grid p b {
+  color: #141b2b;
+}
+
+.threshold-example-grid small {
+  font-size: 17px;
+  margin: 0 7px;
+}
+
+.result-wrong {
+  color: #bb5434;
+  font-size: 16px;
+}
+
+.result-correct {
+  color: #168064;
+  font-size: 16px;
+}
+
+@media (max-height: 760px) {
+  .threshold-step {
+    padding: 14px 21px;
+  }
+
+  .threshold-case-panel {
+    margin-top: 15px;
+  }
+
+  .threshold-example-grid article {
+    padding: 12px 16px;
+  }
+}
+
+@media (max-width: 950px) {
+  .threshold-flow {
+    gap: 10px;
+  }
+
+  .threshold-step {
+    padding: 16px;
+  }
+
+  .threshold-example-grid {
+    gap: 12px;
+  }
+}
