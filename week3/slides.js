@@ -1,0 +1,13 @@
+(() => {"use strict";
+const slides=[...document.querySelectorAll(".slide")];
+const prev=document.getElementById("prev"),next=document.getElementById("next"),counter=document.getElementById("counter"),progress=document.getElementById("progressFill"),notes=document.getElementById("notesPanel"),text=document.getElementById("notesText");
+let n=0;
+function updateScale(){const vw=window.innerWidth,vh=window.innerHeight;const z=Math.min(vw/1366,vh/768);document.documentElement.style.setProperty("--scale",String(Math.max(.56,Math.min(z,1.65))));}
+function show(i,hash=true){n=Math.min(slides.length-1,Math.max(0,i));slides.forEach((s,k)=>{s.classList.toggle("active",k===n);s.setAttribute("aria-hidden",String(k!==n));});counter.textContent=String(n+1).padStart(2,"0")+" / "+String(slides.length).padStart(2,"0");progress.style.width=(100*(n+1)/slides.length)+"%";prev.disabled=n===0;next.disabled=n===slides.length-1;text.textContent=slides[n].querySelector(".notes")?.textContent.trim()||"";if(hash)history.replaceState(null,"","#/"+n);}
+function fromHash(){const m=location.hash.match(/^#\/(\d+)$/);show(m?+m[1]:0,false);}
+function toggleNotes(){notes.hidden=!notes.hidden;}
+prev.addEventListener("click",()=>show(n-1));next.addEventListener("click",()=>show(n+1));document.getElementById("showNotes").addEventListener("click",toggleNotes);document.getElementById("closeNotes").addEventListener("click",()=>notes.hidden=true);document.getElementById("full").addEventListener("click",()=>{if(document.fullscreenElement)document.exitFullscreen?.();else document.documentElement.requestFullscreen?.();});
+window.addEventListener("resize",updateScale);window.addEventListener("hashchange",fromHash);
+window.addEventListener("keydown",e=>{if(["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName))return;if(["ArrowRight","ArrowDown","PageDown"," "].includes(e.key)){e.preventDefault();show(n+1)}else if(["ArrowLeft","ArrowUp","PageUp"].includes(e.key)){e.preventDefault();show(n-1)}else if(e.key==="Home")show(0);else if(e.key==="End")show(slides.length-1);else if(e.key.toLowerCase()==="n")toggleNotes();else if(e.key.toLowerCase()==="f"){document.getElementById("full").click()}else if(e.key==="Escape")notes.hidden=true;});
+let x=null;document.getElementById("deck").addEventListener("touchstart",e=>{if(e.touches.length===1)x=e.touches[0].clientX},{passive:true});document.getElementById("deck").addEventListener("touchend",e=>{if(x===null)return;const d=e.changedTouches[0].clientX-x;if(Math.abs(d)>65)show(n+(d<0?1:-1));x=null;},{passive:true});
+updateScale();fromHash();})();
